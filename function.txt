@@ -1,0 +1,100 @@
+package goserverlessclient
+
+import (
+	"fmt"
+	"log"
+	"os"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/apigateway"
+	"github.com/aws/aws-sdk-go/service/lambda"
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+func test() {
+	restApiId := "testid"
+	functionName := "TestFunction"
+	path := "test"
+	method := "GET"
+
+	f, err := os.Open("./main.zip")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	var bytes []byte
+	_, err = f.Read(bytes)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	f.Close()
+
+	testInput := CreateHTTPFunctionInput{
+		CreateFunctionInput: &lambda.CreateFunctionInput{
+			FunctionName: aws.String(functionName),
+			Code: &lambda.FunctionCode{
+				ZipFile: bytes,
+			},
+		},
+		CreateResourceInput: &apigateway.CreateResourceInput{
+			PathPart:  aws.String(path),
+			RestApiId: aws.String(restApiId),
+		},
+		PutMethodInput: &apigateway.PutMethodInput{
+			HttpMethod: aws.String(method),
+			RestApiId:  aws.String(restApiId),
+		},
+	}
+
+	svc := lambda.New(session.New())
+	input := testInput.CreateFunctionInput
+	_, err = svc.CreateFunction(input)
+
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case lambda.ErrCodeServiceException:
+				fmt.Println(lambda.ErrCodeServiceException, aerr.Error())
+			case lambda.ErrCodeInvalidParameterValueException:
+				fmt.Println(lambda.ErrCodeInvalidParameterValueException, aerr.Error())
+			case lambda.ErrCodeResourceNotFoundException:
+				fmt.Println(lambda.ErrCodeResourceNotFoundException, aerr.Error())
+			case lambda.ErrCodeResourceConflictException:
+				fmt.Println(lambda.ErrCodeResourceConflictException, aerr.Error())
+			case lambda.ErrCodeTooManyRequestsException:
+				fmt.Println(lambda.ErrCodeTooManyRequestsException, aerr.Error())
+			case lambda.ErrCodeCodeStorageExceededException:
+				fmt.Println(lambda.ErrCodeCodeStorageExceededException, aerr.Error())
+			default:
+				fmt.Println(aerr.Error())
+			}
+		} else {
+			// Print the error, cast err to awserr.Error to get the Code and
+			// Message from an error.
+			fmt.Println(err.Error())
+		}
+
+	}
+}
+
+//api gateway rest api
+//apigateway.CreateRestApi
+
+//lambda with http
+//lambda.CreateFunction
+//apigateway.CreateResource
+//apigateway.PutMethod
