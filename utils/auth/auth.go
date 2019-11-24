@@ -8,6 +8,7 @@ import (
 )
 
 var Sess *session.Session
+var Region string
 
 func StartSessionWithShared(region string, profile string) {
 	tmp, err := session.NewSession(&aws.Config{
@@ -24,4 +25,8 @@ func StartSession(region string) {
 	})
 	utils.CheckErr(err)
 	Sess = tmp
+}
+
+func SetRegion(region string) {
+	Region = region
 }

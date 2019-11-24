@@ -1,6 +1,6 @@
 package function
 
-type S3Event struct {
+type S3CreateEvent struct {
 	Bucket *string
 	Prefix *string
 	Suffic *string
@@ -9,10 +9,21 @@ type S3Event struct {
 	Existing bool
 }
 
-type HTTPEvent struct {
+type HTTPCreateEvent struct {
 	Path   *string
 	Method *string
 	Existing bool
 	ApiId *string
 	ApiName *string
+	ExecutionRole *string
+}
+
+type S3DeleteEvent struct {
+	Bucket *string
+}
+
+type HTTPDeleteEvent struct {
+	ApiId *string
+	ResourceId *string
+	Method *string
 }

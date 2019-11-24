@@ -3,12 +3,13 @@ package function
 import (
 	"github.com/alessandromr/goserverlessclient/utils"
 	"github.com/alessandromr/goserverlessclient/utils/auth"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-//CreateFunctionInput is an interface rapresenting a serverless function and the relative trigger
+//CreateFunctionInput is an interface to create a serverless function and the relative trigger
 type CreateFunctionInput interface {
 	CreateDependencies(*lambda.FunctionConfiguration)
 	GetFunctionInput() *lambda.CreateFunctionInput
@@ -18,7 +19,7 @@ type CreateFunctionInput interface {
 //Create serveless function with http trigger
 type HTTPCreateFunctionInput struct {
 	FunctionInput *lambda.CreateFunctionInput
-	HTTPEvent
+	HTTPCreateEvent
 }
 
 //CreateDependencies create all the dependencies for the given trigger
@@ -27,30 +28,62 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	var err error
 
 	//apigateway.CreateRestApi
-	if !input.HTTPEvent.Existing {
+	if !input.HTTPCreateEvent.Existing {
 		apiInput := &apigateway.CreateRestApiInput{
-			Name: input.HTTPEvent.ApiName,
+			Name: input.HTTPCreateEvent.ApiName,
 		}
 		response, err := svc.CreateRestApi(apiInput)
 		utils.CheckErr(err)
-		input.HTTPEvent.ApiId = response.Id
+		input.HTTPCreateEvent.ApiId = response.Id
+	}
+
+	//Get Root Resource
+	//apigateway.GetResources
+	getResourceInput := &apigateway.GetResourcesInput{
+		RestApiId: input.HTTPCreateEvent.ApiId,
+	}
+	getResourceOutput, err := svc.GetResources(getResourceInput)
+	utils.CheckErr(err)
+
+	var rootParent string
+	for _, v := range getResourceOutput.Items {
+		if *v.Path == "/" {
+			rootParent = *v.Id
+		}
 	}
 
 	//apigateway.CreateResource
 	resourceInput := &apigateway.CreateResourceInput{
-		PathPart:  input.HTTPEvent.Path,
-		RestApiId: input.HTTPEvent.ApiId,
+		PathPart:  input.HTTPCreateEvent.Path,
+		RestApiId: input.HTTPCreateEvent.ApiId,
+		ParentId:  aws.String(rootParent),
 	}
-	response, err := svc.CreateResource(resourceInput)
+	createResourceOutput, err := svc.CreateResource(resourceInput)
 	utils.CheckErr(err)
 
 	//apigateway.PutMethod
 	methodInput := &apigateway.PutMethodInput{
-		HttpMethod: input.HTTPEvent.Method,
-		RestApiId:  input.HTTPEvent.ApiId,
-		ResourceId: response.Id,
+		HttpMethod:        input.HTTPCreateEvent.Method,
+		RestApiId:         input.HTTPCreateEvent.ApiId,
+		ResourceId:        createResourceOutput.Id,
+		AuthorizationType: aws.String("NONE"),
 	}
 	_, err = svc.PutMethod(methodInput)
+	utils.CheckErr(err)
+
+	//Put integration between lambda and api gateway method
+	//apigateway.PutIntegration
+
+	integrationInput := &apigateway.PutIntegrationInput{
+		Type:                  aws.String("AWS_PROXY"),
+		Credentials:           input.HTTPCreateEvent.ExecutionRole,
+		HttpMethod:            input.HTTPCreateEvent.Method,
+		RestApiId:             input.HTTPCreateEvent.ApiId,
+		ResourceId:            createResourceOutput.Id,
+		IntegrationHttpMethod: aws.String("POST"),
+		Uri:                   aws.String("arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations"),
+	}
+	_, err = svc.PutIntegration(integrationInput)
 	utils.CheckErr(err)
 }
 
@@ -63,7 +96,7 @@ func (input HTTPCreateFunctionInput) GetFunctionInput() *lambda.CreateFunctionIn
 //Create serveless function with s3 trigger
 type S3CreateFunctionInput struct {
 	FunctionInput *lambda.CreateFunctionInput
-	S3Event
+	S3CreateEvent
 }
 
 //CreateDependencies create all the dependencies for the given trigger
@@ -72,9 +105,9 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 	var err error
 
 	//s3.CreateBucket
-	if !input.S3Event.Existing {
+	if !input.S3CreateEvent.Existing {
 		createBucket := &s3.CreateBucketInput{
-			Bucket: input.S3Event.Bucket,
+			Bucket: input.S3CreateEvent.Bucket,
 		}
 		_, err = svc.CreateBucket(createBucket)
 		utils.CheckErr(err)
@@ -82,12 +115,12 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 
 	//s3.PutBucketNotificationConfiguration
 	putNotConfig := &s3.PutBucketNotificationConfigurationInput{
-		Bucket: input.S3Event.Bucket,
+		Bucket: input.S3CreateEvent.Bucket,
 		NotificationConfiguration: &s3.NotificationConfiguration{
 			LambdaFunctionConfigurations: []*s3.LambdaFunctionConfiguration{
 				&s3.LambdaFunctionConfiguration{
 					LambdaFunctionArn: lambdaResult.FunctionArn,
-					Events:            input.S3Event.Types,
+					Events:            input.S3CreateEvent.Types,
 				},
 			},
 		},
@@ -99,4 +132,36 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 //GetFunctionInput return the CreateFunctionInput from the custom input
 func (input S3CreateFunctionInput) GetFunctionInput() *lambda.CreateFunctionInput {
 	return input.FunctionInput
+}
+
+//DeleteFunctionInput is an interface to delete a serverless function and the relative triggger
+type DeleteFunctionInput interface {
+	DeleteDependencies()
+	GetFunctionInput() *lambda.DeleteFunctionInput
+}
+
+//HTTPDeleteFunctionInput is an implementation of CreateFunctionInput
+//Create serveless function with http trigger
+type HTTPDeleteFunctionInput struct {
+	FunctionInput *lambda.DeleteFunctionInput
+	HTTPDeleteEvent
+}
+
+func (input HTTPDeleteFunctionInput) DeleteDependencies() {
+	//delete integration
+	//delete method
+
+	//if the resource is empty delete it
+	//if the api is empty delete it
+}
+
+//S3DeleteFunctionInput is an implementation of CreateFunctionInput
+//Create serveless function with s3 trigger
+type S3DeleteFunctionInput struct {
+	FunctionInput *lambda.DeleteFunctionInput
+	S3DeleteEvent
+}
+
+func (input S3DeleteFunctionInput) DeleteDependencies() {
+
 }

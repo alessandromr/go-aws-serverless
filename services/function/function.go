@@ -15,3 +15,4 @@ func CreateFunction(input CreateFunctionInput) {
 	//Create Dependencies
 	input.CreateDependencies(lambdaConf)
 }
+
