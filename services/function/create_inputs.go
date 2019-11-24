@@ -11,7 +11,7 @@ import (
 
 //CreateFunctionInput is an interface to create a serverless function and the relative trigger
 type CreateFunctionInput interface {
-	CreateDependencies(*lambda.FunctionConfiguration)
+	CreateDependencies(*lambda.FunctionConfiguration) map[string]interface{}
 	GetFunctionInput() *lambda.CreateFunctionInput
 }
 
@@ -23,7 +23,7 @@ type HTTPCreateFunctionInput struct {
 }
 
 //CreateDependencies create all the dependencies for the given trigger
-func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) {
+func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) map[string]interface{} {
 	svc := apigateway.New(auth.Sess)
 	var err error
 
@@ -85,6 +85,12 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	}
 	_, err = svc.PutIntegration(integrationInput)
 	utils.CheckErr(err)
+
+	out := make(map[string]interface{})
+	out["RestApiId"] = *input.HTTPCreateEvent.ApiId
+	out["Method"] = *input.HTTPCreateEvent.Method
+	out["ResourceId"] = *createResourceOutput.Id
+	return out
 }
 
 //GetFunctionInput return the CreateFunctionInput from the custom input
@@ -132,36 +138,4 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 //GetFunctionInput return the CreateFunctionInput from the custom input
 func (input S3CreateFunctionInput) GetFunctionInput() *lambda.CreateFunctionInput {
 	return input.FunctionInput
-}
-
-//DeleteFunctionInput is an interface to delete a serverless function and the relative triggger
-type DeleteFunctionInput interface {
-	DeleteDependencies()
-	GetFunctionInput() *lambda.DeleteFunctionInput
-}
-
-//HTTPDeleteFunctionInput is an implementation of CreateFunctionInput
-//Create serveless function with http trigger
-type HTTPDeleteFunctionInput struct {
-	FunctionInput *lambda.DeleteFunctionInput
-	HTTPDeleteEvent
-}
-
-func (input HTTPDeleteFunctionInput) DeleteDependencies() {
-	//delete integration
-	//delete method
-
-	//if the resource is empty delete it
-	//if the api is empty delete it
-}
-
-//S3DeleteFunctionInput is an implementation of CreateFunctionInput
-//Create serveless function with s3 trigger
-type S3DeleteFunctionInput struct {
-	FunctionInput *lambda.DeleteFunctionInput
-	S3DeleteEvent
-}
-
-func (input S3DeleteFunctionInput) DeleteDependencies() {
-
 }
