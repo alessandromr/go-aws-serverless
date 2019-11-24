@@ -1,7 +1,11 @@
 package function
 
 import (
+	"github.com/alessandromr/goserverlessclient/utils"
+	"github.com/alessandromr/goserverlessclient/utils/auth"
+	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 //CreateFunctionInput is an interface rapresenting a serverless function and the relative trigger
@@ -19,30 +23,31 @@ type HTTPCreateFunctionInput struct {
 
 //CreateDependencies create all the dependencies for the given trigger
 func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) {
-	svc := apigateway.New(session.New())
+	svc := apigateway.New(auth.Sess)
+	var err error
 
 	//apigateway.CreateRestApi
-	if !input.HTTPEvent.Existing{
+	if !input.HTTPEvent.Existing {
 		apiInput := &apigateway.CreateRestApiInput{
-			Name: aws.String(input.HTTPEvent.ApiName),
+			Name: input.HTTPEvent.ApiName,
 		}
-		response, err = svc.CreateRestApi(apiInput)
+		response, err := svc.CreateRestApi(apiInput)
 		utils.CheckErr(err)
-		input.HTTPEvent.RestApiId = response.Id
+		input.HTTPEvent.ApiId = response.Id
 	}
 
 	//apigateway.CreateResource
 	resourceInput := &apigateway.CreateResourceInput{
-		PathPart: aws.String(input.HTTPEvent.Path),
-		RestApiId: aws.String(input.HTTPEvent.ApiId),
+		PathPart:  input.HTTPEvent.Path,
+		RestApiId: input.HTTPEvent.ApiId,
 	}
-	response, err = svc.CreateResource(resourceInput)
+	response, err := svc.CreateResource(resourceInput)
 	utils.CheckErr(err)
 
 	//apigateway.PutMethod
 	methodInput := &apigateway.PutMethodInput{
 		HttpMethod: input.HTTPEvent.Method,
-		RestApiId: aws.String(input.HTTPEvent.ApiId),
+		RestApiId:  input.HTTPEvent.ApiId,
 		ResourceId: response.Id,
 	}
 	_, err = svc.PutMethod(methodInput)
@@ -63,12 +68,13 @@ type S3CreateFunctionInput struct {
 
 //CreateDependencies create all the dependencies for the given trigger
 func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) {
-	svc := s3.New(session.New())
+	svc := s3.New(auth.Sess)
+	var err error
 
 	//s3.CreateBucket
-	if !input.S3Event.Existing{
+	if !input.S3Event.Existing {
 		createBucket := &s3.CreateBucketInput{
-			Bucket: aws.String(input.S3Event.Bucket),
+			Bucket: input.S3Event.Bucket,
 		}
 		_, err = svc.CreateBucket(createBucket)
 		utils.CheckErr(err)
@@ -76,11 +82,13 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 
 	//s3.PutBucketNotificationConfiguration
 	putNotConfig := &s3.PutBucketNotificationConfigurationInput{
-		Bucket: aws.String(input.S3Event.Bucket),
+		Bucket: input.S3Event.Bucket,
 		NotificationConfiguration: &s3.NotificationConfiguration{
-			LambdaFunctionConfiguration: &s3.LambdaFunctionConfiguration{
-				LambdaFunctionArn: aws.String(lambdaResult.FunctionArn),
-				Events: aws.StringSlice(input.S3Event.Types),
+			LambdaFunctionConfigurations: []*s3.LambdaFunctionConfiguration{
+				&s3.LambdaFunctionConfiguration{
+					LambdaFunctionArn: lambdaResult.FunctionArn,
+					Events:            input.S3Event.Types,
+				},
 			},
 		},
 	}
