@@ -5,11 +5,12 @@ import (
 	"github.com/alessandromr/goserverlessclient/utils/auth"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 //DeleteFunctionInput is an interface to delete a serverless function and the relative triggger
 type DeleteFunctionInput interface {
-	DeleteDependencies()
+	DeleteDependencies(*lambda.DeleteFunctionInput)
 	GetFunctionInput() *lambda.DeleteFunctionInput
 }
 
@@ -20,7 +21,7 @@ type HTTPDeleteFunctionInput struct {
 	HTTPDeleteEvent
 }
 
-func (input HTTPDeleteFunctionInput) DeleteDependencies() {
+func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.DeleteFunctionInput) {
 	svc := apigateway.New(auth.Sess)
 	var err error
 
@@ -87,7 +88,28 @@ type S3DeleteFunctionInput struct {
 	S3DeleteEvent
 }
 
-func (input S3DeleteFunctionInput) DeleteDependencies() {
+func (input S3DeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.DeleteFunctionInput) {
+	svc := s3.New(auth.Sess)
+	lambdaClient := lambda.New(auth.Sess)
+	var err error
+
+	//lambda.RemovePermission
+	permissionsInput := &lambda.RemovePermissionInput{
+		FunctionName: lambdaResult.FunctionName,
+		StatementId: input.StatementId,
+	}
+	_, err = lambdaClient.RemovePermission(permissionsInput)
+	utils.CheckErr(err)
+
+	//s3.CreateBucket
+	if input.S3DeleteEvent.ToDelete {
+		deleteBucket := &s3.DeleteBucketInput{
+			Bucket: input.S3DeleteEvent.Bucket,
+		}
+		_, err = svc.DeleteBucket(deleteBucket)
+		utils.CheckErr(err)
+	}
+
 
 }
 

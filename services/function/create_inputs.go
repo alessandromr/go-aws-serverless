@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"log"
 )
 
 //CreateFunctionInput is an interface to create a serverless function and the relative trigger
@@ -106,10 +107,12 @@ type S3CreateFunctionInput struct {
 }
 
 //CreateDependencies create all the dependencies for the given trigger
-func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) {
+func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) map[string]interface{} {
 	svc := s3.New(auth.Sess)
+	lambdaClient := lambda.New(auth.Sess)
 	var err error
 
+	log.Println("Bucket")
 	//s3.CreateBucket
 	if !input.S3CreateEvent.Existing {
 		createBucket := &s3.CreateBucketInput{
@@ -118,6 +121,18 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 		_, err = svc.CreateBucket(createBucket)
 		utils.CheckErr(err)
 	}
+	log.Println("NotConf")
+
+	//lambda.AddPermission
+	permissionsInput := &lambda.AddPermissionInput{
+		Action:       aws.String("lambda:InvokeFunction"),
+		FunctionName: lambdaResult.FunctionArn,
+		Principal:    aws.String("s3.amazonaws.com"),
+		SourceArn:    aws.String("arn:aws:s3:::" + *input.S3CreateEvent.Bucket),
+		StatementId:  aws.String("S3Event_" + *input.S3CreateEvent.Bucket + "_" + *lambdaResult.FunctionName),
+	}
+	permissionsOutput, err := lambdaClient.AddPermission(permissionsInput)
+	utils.CheckErr(err)
 
 	//s3.PutBucketNotificationConfiguration
 	putNotConfig := &s3.PutBucketNotificationConfigurationInput{
@@ -133,6 +148,13 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 	}
 	_, err = svc.PutBucketNotificationConfiguration(putNotConfig)
 	utils.CheckErr(err)
+
+	out := make(map[string]interface{})
+	out["Bucket"] = *input.S3CreateEvent.Bucket
+	out["ToDelete"] = !input.S3CreateEvent.Existing
+	out["LambdaPermission"] = permissionsOutput.Statement
+	return out
+
 }
 
 //GetFunctionInput return the CreateFunctionInput from the custom input

@@ -20,6 +20,8 @@ type HTTPCreateEvent struct {
 
 type S3DeleteEvent struct {
 	Bucket *string
+	StatementId *string
+	ToDelete bool
 }
 
 type HTTPDeleteEvent struct {

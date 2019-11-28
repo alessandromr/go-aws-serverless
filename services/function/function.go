@@ -25,11 +25,12 @@ func CreateFunction(input CreateFunctionInput) map[string]interface{} {
 func DeleteFunction(input DeleteFunctionInput) {
 	//Create Lambda Client
 	svc := lambda.New(auth.Sess)
+	lambdaConf := input.GetFunctionInput()
 
 	//Delete Dependencies
-	input.DeleteDependencies()
+	input.DeleteDependencies(lambdaConf)
 
 	//Delete lambda function
-	_, err := svc.DeleteFunction(input.GetFunctionInput())
+	_, err := svc.DeleteFunction(lambdaConf)
 	utils.CheckErr(err)
 }
