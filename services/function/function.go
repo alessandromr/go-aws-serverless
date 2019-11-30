@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/lambda"
 )
 
+// CreateFunction will create function and all the dependencies
 func CreateFunction(input CreateFunctionInput) map[string]interface{} {
 	//Create response Object
 	out := make(map[string]interface{})
@@ -22,6 +23,7 @@ func CreateFunction(input CreateFunctionInput) map[string]interface{} {
 	return out
 }
 
+// DeleteFunction will delete the function and all the dependencies
 func DeleteFunction(input DeleteFunctionInput) {
 	//Create Lambda Client
 	svc := lambda.New(auth.Sess)

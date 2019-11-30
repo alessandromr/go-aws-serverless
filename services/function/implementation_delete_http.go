@@ -5,22 +5,9 @@ import (
 	"github.com/alessandromr/goserverlessclient/utils/auth"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
-	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-//DeleteFunctionInput is an interface to delete a serverless function and the relative triggger
-type DeleteFunctionInput interface {
-	DeleteDependencies(*lambda.DeleteFunctionInput)
-	GetFunctionInput() *lambda.DeleteFunctionInput
-}
-
-//HTTPDeleteFunctionInput is an implementation of CreateFunctionInput
-//Create serveless function with http trigger
-type HTTPDeleteFunctionInput struct {
-	FunctionInput *lambda.DeleteFunctionInput
-	HTTPDeleteEvent
-}
-
+//DeleteDependencies implements the dependencies deletion for HTTP Event
 func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.DeleteFunctionInput) {
 	svc := apigateway.New(auth.Sess)
 	var err error
@@ -78,42 +65,5 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 
 //GetFunctionInput return the DeleteFunctionInput from the custom input
 func (input HTTPDeleteFunctionInput) GetFunctionInput() *lambda.DeleteFunctionInput {
-	return input.FunctionInput
-}
-
-//S3DeleteFunctionInput is an implementation of CreateFunctionInput
-//Create serveless function with s3 trigger
-type S3DeleteFunctionInput struct {
-	FunctionInput *lambda.DeleteFunctionInput
-	S3DeleteEvent
-}
-
-func (input S3DeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.DeleteFunctionInput) {
-	svc := s3.New(auth.Sess)
-	lambdaClient := lambda.New(auth.Sess)
-	var err error
-
-	//lambda.RemovePermission
-	permissionsInput := &lambda.RemovePermissionInput{
-		FunctionName: lambdaResult.FunctionName,
-		StatementId: input.StatementId,
-	}
-	_, err = lambdaClient.RemovePermission(permissionsInput)
-	utils.CheckErr(err)
-
-	//s3.CreateBucket
-	if input.S3DeleteEvent.ToDelete {
-		deleteBucket := &s3.DeleteBucketInput{
-			Bucket: input.S3DeleteEvent.Bucket,
-		}
-		_, err = svc.DeleteBucket(deleteBucket)
-		utils.CheckErr(err)
-	}
-
-
-}
-
-//GetFunctionInput return the DeleteFunctionInput from the custom input
-func (input S3DeleteFunctionInput) GetFunctionInput() *lambda.DeleteFunctionInput {
 	return input.FunctionInput
 }
