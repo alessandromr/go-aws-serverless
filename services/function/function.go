@@ -74,7 +74,7 @@ func ReadFunction(input ReadFunctionInput)map[string]interface{} {
 	utils.InfoLog.Println("Reading The Dependencies")
 	out = input.ReadDependencies(funcResponse)
 
-	out["FunctionArn"] = funcResponse.FunctionArn
+	out["FunctionArn"] = *funcResponse.FunctionArn
 	return out
 }
 

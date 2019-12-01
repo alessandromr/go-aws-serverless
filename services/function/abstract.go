@@ -17,6 +17,7 @@ func Rollback(input DeleteFunctionInput, err error) {
 	*/
 
 	utils.ErrLog.Println("Rollback")
+	utils.ErrLog.Println(err)
 	time.Sleep(utils.LongSleep * time.Millisecond)
 	input.DeleteDependencies(input.GetFunctionInput())
 }
