@@ -1,7 +1,6 @@
 package function
 
 import (
-	"github.com/alessandromr/goserverlessclient/utils"
 	"github.com/alessandromr/goserverlessclient/utils/auth"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/lambda"
@@ -38,8 +37,6 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 		Rollback(rollback, err)
 		return nil, err
 	}
-
-	utils.CheckErr(err)
 
 	//s3.PutBucketNotificationConfiguration
 	putNotConfig := &s3.PutBucketNotificationConfigurationInput{

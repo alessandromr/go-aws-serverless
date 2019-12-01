@@ -1,7 +1,6 @@
 package function
 
 import (
-	"github.com/alessandromr/goserverlessclient/utils"
 	"github.com/alessandromr/goserverlessclient/utils/auth"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/apigateway"
@@ -27,7 +26,10 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 			Name: input.HTTPCreateEvent.ApiName,
 		}
 		response, err := svc.CreateRestApi(apiInput)
-		utils.CheckErr(err)
+		if err != nil {
+			Rollback(rollback, err)
+			return nil, err
+		}
 		input.HTTPCreateEvent.ApiId = response.Id
 		rollback.HTTPDeleteEvent.ApiId = response.Id
 	}
