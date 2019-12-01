@@ -54,3 +54,27 @@ func DeleteFunction(input DeleteFunctionInput) {
 	_, err := svc.DeleteFunction(lambdaConf)
 	utils.CheckAWSErrExpect404(err, "Lambda Function")
 }
+
+
+
+// ReadFunction will return the function and all the dependencies details
+func ReadFunction(input ReadFunctionInput)map[string]interface{} {
+	var out map[string]interface{}
+
+	//Create Lambda Client
+	svc := lambda.New(auth.Sess)
+	lambdaConf := input.GetFunctionConfiguration()
+
+	//Read lambda function
+	utils.InfoLog.Println("Reading The Lambda Function")
+	funcResponse, err := svc.GetFunctionConfiguration(lambdaConf)
+	utils.CheckErr(err)
+
+	//Read Dependencies
+	utils.InfoLog.Println("Reading The Dependencies")
+	out = input.ReadDependencies(funcResponse)
+
+	out["FunctionArn"] = funcResponse.FunctionArn
+	return out
+}
+
