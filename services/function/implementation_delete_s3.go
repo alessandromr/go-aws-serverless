@@ -18,23 +18,20 @@ func (input S3DeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Delet
 	putNotConfig := &s3.PutBucketNotificationConfigurationInput{
 		Bucket: input.S3DeleteEvent.Bucket,
 		NotificationConfiguration: &s3.NotificationConfiguration{
-			LambdaFunctionConfigurations: []*s3.LambdaFunctionConfiguration{
-
-			},
+			LambdaFunctionConfigurations: []*s3.LambdaFunctionConfiguration{},
 		},
 	}
 
 	_, err = svc.PutBucketNotificationConfiguration(putNotConfig)
-	utils.CheckErr(err)
+	utils.CheckAWSErrExpect404(err, "S3 Bucket Notification Configuration")
 
 	//lambda.RemovePermission
 	permissionsInput := &lambda.RemovePermissionInput{
 		FunctionName: lambdaResult.FunctionName,
-		StatementId: input.StatementId,
+		StatementId:  input.StatementId,
 	}
 	_, err = lambdaClient.RemovePermission(permissionsInput)
-	utils.CheckErr(err)
-
+	utils.CheckAWSErrExpect404(err, "Lambda S3 Permission")
 }
 
 //GetFunctionInput return the DeleteFunctionInput from the custom input

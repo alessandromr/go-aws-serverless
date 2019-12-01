@@ -19,7 +19,7 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 		RestApiId:  input.HTTPDeleteEvent.ApiId,
 	}
 	_, err = svc.DeleteIntegration(integrationInput)
-	utils.CheckErr(err)
+	utils.CheckAWSErrExpect404(err, "API Gateway Integration")
 
 	//delete method
 	methodInput := &apigateway.DeleteMethodInput{
@@ -28,7 +28,7 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 		RestApiId:  input.HTTPDeleteEvent.ApiId,
 	}
 	_, err = svc.DeleteMethod(methodInput)
-	utils.CheckErr(err)
+	utils.CheckAWSErrExpect404(err, "API Gateway Method")
 
 	//check if resource is empty
 	getResourceInput := &apigateway.GetResourceInput{
@@ -36,6 +36,7 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 		RestApiId:  input.HTTPDeleteEvent.ApiId,
 	}
 	resourceResponse, err := svc.GetResource(getResourceInput)
+	utils.CheckAWSErrExpect404(err, "API Gateway Get Resources")
 
 	if len(resourceResponse.ResourceMethods) < 1 {
 		//delete resource
@@ -44,7 +45,7 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 			RestApiId:  input.HTTPDeleteEvent.ApiId,
 		}
 		_, err = svc.DeleteResource(resourceInput)
-		utils.CheckErr(err)
+		utils.CheckAWSErrExpect404(err, "API Gateway Resource")
 	}
 
 	//check if api is empty
@@ -52,6 +53,7 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 		RestApiId: input.HTTPDeleteEvent.ApiId,
 	}
 	getResourcesOutput, err := svc.GetResources(getResourcesInput)
+	utils.CheckAWSErrExpect404(err, "API Gateway Get Resources")
 
 	if len(getResourcesOutput.Items) <= 1 {
 		//delete api
@@ -59,8 +61,9 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 			RestApiId: input.HTTPDeleteEvent.ApiId,
 		}
 		_, err = svc.DeleteRestApi(apiInput)
-		utils.CheckErr(err)
+		utils.CheckAWSErrExpect404(err, "API Gateway Rest API")
 	}
+
 }
 
 //GetFunctionInput return the DeleteFunctionInput from the custom input
