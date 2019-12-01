@@ -8,17 +8,33 @@ import (
 
 // CreateFunction will create function and all the dependencies
 func CreateFunction(input CreateFunctionInput) map[string]interface{} {
+	var err error
 	//Create response Object
 	out := make(map[string]interface{})
 
 	//Create Lambda Client
 	svc := lambda.New(auth.Sess)
+
 	//Create lambda function
+	utils.InfoLog.Println("Creating The Lambda Function")
 	lambdaConf, err := svc.CreateFunction(input.GetFunctionInput())
 	utils.CheckErr(err)
 
 	//Create Dependencies
-	out = input.CreateDependencies(lambdaConf)
+	utils.InfoLog.Println("Creating The Dependencies")
+	out, err = input.CreateDependencies(lambdaConf)
+
+	if err != nil{
+		//Rollback
+		utils.InfoLog.Println("Deleting The Lambda Function")
+		_, lerr := svc.DeleteFunction(&lambda.DeleteFunctionInput{
+			FunctionName: lambdaConf.FunctionArn,
+		})
+		utils.CheckAWSErrExpect404(lerr, "Lambda Function")
+		return nil
+	}
+
+	//Create Output
 	out["FunctionArn"] = *lambdaConf.FunctionArn
 	return out
 }
@@ -30,9 +46,11 @@ func DeleteFunction(input DeleteFunctionInput) {
 	lambdaConf := input.GetFunctionInput()
 
 	//Delete Dependencies
+	utils.InfoLog.Println("Deleting The Dependencies")
 	input.DeleteDependencies(lambdaConf)
 
 	//Delete lambda function
+	utils.InfoLog.Println("Deleting The Lambda Function")
 	_, err := svc.DeleteFunction(lambdaConf)
-	utils.CheckErr(err)
+	utils.CheckAWSErrExpect404(err, "Lambda Function")
 }
