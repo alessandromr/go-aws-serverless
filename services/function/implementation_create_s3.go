@@ -1,7 +1,10 @@
 package function
 
 import (
+	"time"
+
 	"github.com/alessandromr/goserverlessclient/utils/auth"
+	"github.com/alessandromr/goserverlessclient/utils"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -37,6 +40,8 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 		Rollback(rollback, err)
 		return nil, err
 	}
+
+	time.Sleep(utils.ShortSleep * time.Millisecond)
 
 	//s3.PutBucketNotificationConfiguration
 	putNotConfig := &s3.PutBucketNotificationConfigurationInput{

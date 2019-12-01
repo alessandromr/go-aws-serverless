@@ -1,6 +1,7 @@
 package function
 
 import (
+	"time"
 	"github.com/alessandromr/goserverlessclient/utils"
 	"github.com/alessandromr/goserverlessclient/utils/auth"
 	"github.com/aws/aws-sdk-go/service/apigateway"
@@ -20,6 +21,7 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 	}
 	_, err = svc.DeleteIntegration(integrationInput)
 	utils.CheckAWSErrExpect404(err, "API Gateway Integration")
+	time.Sleep(utils.ShortSleep * time.Millisecond)
 
 	//delete method
 	methodInput := &apigateway.DeleteMethodInput{
@@ -29,6 +31,7 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 	}
 	_, err = svc.DeleteMethod(methodInput)
 	utils.CheckAWSErrExpect404(err, "API Gateway Method")
+	time.Sleep(utils.ShortSleep * time.Millisecond)
 
 	//check if resource is empty
 	getResourceInput := &apigateway.GetResourceInput{
@@ -37,6 +40,7 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 	}
 	resourceResponse, err := svc.GetResource(getResourceInput)
 	utils.CheckAWSErrExpect404(err, "API Gateway Get Resources")
+	time.Sleep(utils.ShortSleep * time.Millisecond)
 
 	if len(resourceResponse.ResourceMethods) < 1 {
 		//delete resource
@@ -46,6 +50,7 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 		}
 		_, err = svc.DeleteResource(resourceInput)
 		utils.CheckAWSErrExpect404(err, "API Gateway Resource")
+		time.Sleep(utils.ShortSleep * time.Millisecond)
 	}
 
 	//check if api is empty
@@ -54,6 +59,7 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 	}
 	getResourcesOutput, err := svc.GetResources(getResourcesInput)
 	utils.CheckAWSErrExpect404(err, "API Gateway Get Resources")
+	time.Sleep(utils.ShortSleep * time.Millisecond)
 
 	if len(getResourcesOutput.Items) <= 1 {
 		//delete api

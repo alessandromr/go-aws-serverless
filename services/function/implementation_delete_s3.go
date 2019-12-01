@@ -1,6 +1,7 @@
 package function
 
 import (
+	"time"
 	"github.com/alessandromr/goserverlessclient/utils"
 	"github.com/alessandromr/goserverlessclient/utils/auth"
 	"github.com/aws/aws-sdk-go/service/lambda"
@@ -24,6 +25,7 @@ func (input S3DeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Delet
 
 	_, err = svc.PutBucketNotificationConfiguration(putNotConfig)
 	utils.CheckAWSErrExpect404(err, "S3 Bucket Notification Configuration")
+	time.Sleep(utils.ShortSleep * time.Millisecond)
 
 	//lambda.RemovePermission
 	permissionsInput := &lambda.RemovePermissionInput{

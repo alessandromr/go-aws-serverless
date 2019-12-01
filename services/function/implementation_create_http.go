@@ -1,7 +1,10 @@
 package function
 
 import (
+	"time"
+
 	"github.com/alessandromr/goserverlessclient/utils/auth"
+	"github.com/alessandromr/goserverlessclient/utils"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
@@ -34,6 +37,8 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		rollback.HTTPDeleteEvent.ApiId = response.Id
 	}
 
+	time.Sleep(utils.ShortSleep * time.Millisecond)
+
 	//Get Root Resource
 	//apigateway.GetResources
 	getResourceInput := &apigateway.GetResourcesInput{
@@ -52,6 +57,8 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		}
 	}
 
+	time.Sleep(utils.ShortSleep * time.Millisecond)
+
 	//apigateway.CreateResource
 	resourceInput := &apigateway.CreateResourceInput{
 		PathPart:  input.HTTPCreateEvent.Path,
@@ -64,6 +71,8 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		Rollback(rollback, err)
 		return nil, err
 	}
+
+	time.Sleep(utils.ShortSleep * time.Millisecond)
 
 	//apigateway.PutMethod
 	methodInput := &apigateway.PutMethodInput{
@@ -78,6 +87,8 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		Rollback(rollback, err)
 		return nil, err
 	}
+
+	time.Sleep(utils.ShortSleep * time.Millisecond)
 
 	//Put integration between lambda and api gateway method
 	//apigateway.PutIntegration

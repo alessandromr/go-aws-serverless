@@ -1,6 +1,7 @@
 package function
 
 import (
+	"time"
 	"github.com/alessandromr/goserverlessclient/utils"
 )
 
@@ -16,5 +17,6 @@ func Rollback(input DeleteFunctionInput, err error) {
 	*/
 
 	utils.ErrLog.Println("Rollback")
+	time.Sleep(utils.LongSleep * time.Millisecond)
 	input.DeleteDependencies(input.GetFunctionInput())
 }
