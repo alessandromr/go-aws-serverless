@@ -6,7 +6,7 @@ import (
 
 //CreateFunctionInput is an interface to create a serverless function and the relative trigger
 type CreateFunctionInput interface {
-	CreateDependencies(*lambda.FunctionConfiguration) map[string]interface{}
+	CreateDependencies(*lambda.FunctionConfiguration) (map[string]interface{}, error)
 	GetFunctionInput() *lambda.CreateFunctionInput
 }
 

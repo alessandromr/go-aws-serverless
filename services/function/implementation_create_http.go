@@ -9,9 +9,17 @@ import (
 )
 
 //CreateDependencies create all the dependencies for the HTTPEvent
-func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) map[string]interface{} {
+func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) (map[string]interface{}, error) {
 	svc := apigateway.New(auth.Sess)
 	var err error
+
+	//Prepare a rollback object in case of failure
+	rollback := HTTPDeleteFunctionInput{
+		FunctionInput: &lambda.DeleteFunctionInput{
+			FunctionName: lambdaResult.FunctionArn,
+		},
+		HTTPDeleteEvent: HTTPDeleteEvent{},
+	}
 
 	//apigateway.CreateRestApi
 	if !input.HTTPCreateEvent.Existing {
@@ -21,6 +29,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		response, err := svc.CreateRestApi(apiInput)
 		utils.CheckErr(err)
 		input.HTTPCreateEvent.ApiId = response.Id
+		rollback.HTTPDeleteEvent.ApiId = response.Id
 	}
 
 	//Get Root Resource
@@ -29,7 +38,10 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		RestApiId: input.HTTPCreateEvent.ApiId,
 	}
 	getResourceOutput, err := svc.GetResources(getResourceInput)
-	utils.CheckErr(err)
+	if err != nil {
+		Rollback(rollback, err)
+		return nil, err
+	}
 
 	var rootParent string
 	for _, v := range getResourceOutput.Items {
@@ -45,7 +57,11 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		ParentId:  aws.String(rootParent),
 	}
 	createResourceOutput, err := svc.CreateResource(resourceInput)
-	utils.CheckErr(err)
+	rollback.HTTPDeleteEvent.ResourceId = createResourceOutput.Id
+	if err != nil {
+		Rollback(rollback, err)
+		return nil, err
+	}
 
 	//apigateway.PutMethod
 	methodInput := &apigateway.PutMethodInput{
@@ -55,7 +71,11 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		AuthorizationType: aws.String("NONE"),
 	}
 	_, err = svc.PutMethod(methodInput)
-	utils.CheckErr(err)
+	rollback.HTTPDeleteEvent.Method = input.HTTPCreateEvent.Method
+	if err != nil {
+		Rollback(rollback, err)
+		return nil, err
+	}
 
 	//Put integration between lambda and api gateway method
 	//apigateway.PutIntegration
@@ -70,13 +90,16 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		Uri:                   aws.String("arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations"),
 	}
 	_, err = svc.PutIntegration(integrationInput)
-	utils.CheckErr(err)
+	if err != nil {
+		Rollback(rollback, err)
+		return nil, err
+	}
 
 	out := make(map[string]interface{})
 	out["RestApiId"] = *input.HTTPCreateEvent.ApiId
 	out["Method"] = *input.HTTPCreateEvent.Method
 	out["ResourceId"] = *createResourceOutput.Id
-	return out
+	return out, nil
 }
 
 //GetFunctionInput return the CreateFunctionInput from the custom input
