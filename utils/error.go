@@ -30,12 +30,12 @@ func CheckAWSErrExpect404(err error, resourceName string) {
 	if err != nil {
 		awsErr, cerr := err.(awserr.Error)
 		//if is an aws error check aws logic
-		if cerr == true{
+		if cerr == true {
 			switch awsErr.Code() {
 			case "ResourceNotFoundException":
 				WarnLog.Printf("%s: resource not found\n", resourceName)
 				break
-			case  "NotFoundException":
+			case "NotFoundException":
 				WarnLog.Printf("%s: resource not found\n", resourceName)
 				break
 			default:

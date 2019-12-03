@@ -1,24 +1,24 @@
-package integration
+package method
 
 import (
-	"github.com/alessandromr/goserverlessclient/utils/auth"
+	"github.com/alessandromr/go-serverless-client/utils/auth"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 )
 
-type ApiGatewayIntegration struct {
+type ApiGatewayMethod struct {
 	HttpMethod string
 	ResourceId string
 	RestApiId  string
 }
 
 //Delete the given resources
-func (resource ApiGatewayIntegration) Delete() error {
+func (resource ApiGatewayMethod) Delete() error {
 	svc := apigateway.New(auth.Sess)
-	integrationInput := &apigateway.DeleteIntegrationInput{
+	methodInput := &apigateway.DeleteMethodInput{
 		HttpMethod: &resource.HttpMethod,
 		ResourceId: &resource.ResourceId,
 		RestApiId:  &resource.RestApiId,
 	}
-	_, err := svc.DeleteIntegration(integrationInput)
+	_, err := svc.DeleteMethod(methodInput)
 	return err
 }

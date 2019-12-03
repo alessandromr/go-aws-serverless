@@ -3,8 +3,12 @@ package function
 import (
 	"time"
 
-	"github.com/alessandromr/goserverlessclient/utils/auth"
-	"github.com/alessandromr/goserverlessclient/utils"
+	"github.com/alessandromr/go-serverless-client/manager/rollback"
+	"github.com/alessandromr/go-serverless-client/resource/lambda/permission"
+	"github.com/alessandromr/go-serverless-client/resource/s3/notification"
+	"github.com/alessandromr/go-serverless-client/utils"
+	"github.com/alessandromr/go-serverless-client/utils/auth"
+	"github.com/alessandromr/go-serverless-client/utils/convert"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -16,16 +20,6 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 	lambdaClient := lambda.New(auth.Sess)
 	var err error
 
-	//Prepare a rollback object in case of failure
-	rollback := S3DeleteFunctionInput{
-		FunctionInput: &lambda.DeleteFunctionInput{
-			FunctionName: lambdaResult.FunctionArn,
-		},
-		S3DeleteEvent: S3DeleteEvent{
-			Bucket: input.S3CreateEvent.Bucket,
-		},
-	}
-
 	//lambda.AddPermission
 	permissionsInput := &lambda.AddPermissionInput{
 		Action:       aws.String("lambda:InvokeFunction"),
@@ -35,9 +29,15 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 		StatementId:  aws.String("S3Event_" + *input.S3CreateEvent.Bucket + "_" + *lambdaResult.FunctionName),
 	}
 	permissionsOutput, err := lambdaClient.AddPermission(permissionsInput)
-	rollback.S3DeleteEvent.StatementId = aws.String("S3Event_" + *input.S3CreateEvent.Bucket + "_" + *lambdaResult.FunctionName)
+	rollback.ResourcesList = append(
+		rollback.ResourcesList,
+		permission.LambdaPermission{
+			StatementId:  "S3Event_" + *input.S3CreateEvent.Bucket + "_" + *lambdaResult.FunctionName,
+			FunctionName: *lambdaResult.FunctionArn,
+		},
+	)
 	if err != nil {
-		Rollback(rollback, err)
+		rollback.ExecuteRollback()
 		return nil, err
 	}
 
@@ -48,7 +48,7 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 		Bucket: input.S3CreateEvent.Bucket,
 		NotificationConfiguration: &s3.NotificationConfiguration{
 			LambdaFunctionConfigurations: []*s3.LambdaFunctionConfiguration{
-				&s3.LambdaFunctionConfiguration{
+				{
 					LambdaFunctionArn: lambdaResult.FunctionArn,
 					Events:            input.S3CreateEvent.Types,
 				},
@@ -56,8 +56,16 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 		},
 	}
 	_, err = svc.PutBucketNotificationConfiguration(putNotConfig)
+	rollback.ResourcesList = append(
+		rollback.ResourcesList,
+		notification.S3NotificationConfiguration{
+			Bucket:      *input.S3CreateEvent.Bucket,
+			Events:      convert.StringSlice(input.S3CreateEvent.Types),
+			FunctionArn: *lambdaResult.FunctionArn,
+		},
+	)
 	if err != nil {
-		Rollback(rollback, err)
+		rollback.ExecuteRollback()
 		return nil, err
 	}
 

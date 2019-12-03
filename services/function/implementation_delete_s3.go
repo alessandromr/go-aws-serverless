@@ -1,11 +1,11 @@
 package function
 
 import (
-	"time"
-	"github.com/alessandromr/goserverlessclient/utils"
-	"github.com/alessandromr/goserverlessclient/utils/auth"
+	"github.com/alessandromr/go-serverless-client/utils"
+	"github.com/alessandromr/go-serverless-client/utils/auth"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"time"
 )
 
 //DeleteDependencies implements the dependencies deletion for S3 Event

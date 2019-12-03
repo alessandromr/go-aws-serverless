@@ -1,8 +1,8 @@
 package function
 
 import (
+	"github.com/alessandromr/go-serverless-client/utils"
 	"time"
-	"github.com/alessandromr/goserverlessclient/utils"
 )
 
 //Rollback call the object's DeleteDependencies method

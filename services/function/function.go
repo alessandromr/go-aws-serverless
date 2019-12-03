@@ -1,8 +1,8 @@
 package function
 
 import (
-	"github.com/alessandromr/goserverlessclient/utils"
-	"github.com/alessandromr/goserverlessclient/utils/auth"
+	"github.com/alessandromr/go-serverless-client/utils"
+	"github.com/alessandromr/go-serverless-client/utils/auth"
 	"github.com/aws/aws-sdk-go/service/lambda"
 )
 
@@ -24,7 +24,7 @@ func CreateFunction(input CreateFunctionInput) map[string]interface{} {
 	utils.InfoLog.Println("Creating The Dependencies")
 	out, err = input.CreateDependencies(lambdaConf)
 
-	if err != nil{
+	if err != nil {
 		//Rollback
 		utils.InfoLog.Println("Deleting The Lambda Function")
 		_, lerr := svc.DeleteFunction(&lambda.DeleteFunctionInput{
@@ -55,10 +55,8 @@ func DeleteFunction(input DeleteFunctionInput) {
 	utils.CheckAWSErrExpect404(err, "Lambda Function")
 }
 
-
-
 // ReadFunction will return the function and all the dependencies details
-func ReadFunction(input ReadFunctionInput)map[string]interface{} {
+func ReadFunction(input ReadFunctionInput) map[string]interface{} {
 	var out map[string]interface{}
 
 	//Create Lambda Client
@@ -77,4 +75,3 @@ func ReadFunction(input ReadFunctionInput)map[string]interface{} {
 	out["FunctionArn"] = *funcResponse.FunctionArn
 	return out
 }
-
