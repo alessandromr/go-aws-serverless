@@ -29,6 +29,10 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 		StatementId:  aws.String("S3Event_" + *input.S3CreateEvent.Bucket + "_" + *lambdaResult.FunctionName),
 	}
 	permissionsOutput, err := lambdaClient.AddPermission(permissionsInput)
+	if err != nil {
+		rollback.ExecuteRollback()
+		return nil, err
+	}
 	rollback.ResourcesList = append(
 		rollback.ResourcesList,
 		permission.LambdaPermission{
@@ -36,10 +40,6 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 			FunctionName: *lambdaResult.FunctionArn,
 		},
 	)
-	if err != nil {
-		rollback.ExecuteRollback()
-		return nil, err
-	}
 
 	time.Sleep(utils.ShortSleep * time.Millisecond)
 
@@ -56,6 +56,10 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 		},
 	}
 	_, err = svc.PutBucketNotificationConfiguration(putNotConfig)
+	if err != nil {
+		rollback.ExecuteRollback()
+		return nil, err
+	}
 	rollback.ResourcesList = append(
 		rollback.ResourcesList,
 		notification.S3NotificationConfiguration{
@@ -64,11 +68,6 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 			FunctionArn: *lambdaResult.FunctionArn,
 		},
 	)
-	if err != nil {
-		rollback.ExecuteRollback()
-		return nil, err
-	}
-
 	out := make(map[string]interface{})
 	out["Bucket"] = *input.S3CreateEvent.Bucket
 	out["LambdaPermission"] = permissionsOutput.Statement

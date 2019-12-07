@@ -68,6 +68,11 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		ParentId:  aws.String(rootParent),
 	}
 	createResourceOutput, err := svc.CreateResource(resourceInput)
+	if err != nil {
+		log.Println(err)
+		rollback.ExecuteRollback()
+		return nil, err
+	}
 	rollback.ResourcesList = append(
 		rollback.ResourcesList,
 		resource.ApiGatewayResource{
@@ -77,11 +82,6 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 			ParentId:   rootParent,
 		},
 	)
-	if err != nil {
-		log.Println(err)
-		rollback.ExecuteRollback()
-		return nil, err
-	}
 
 	time.Sleep(utils.ShortSleep * time.Millisecond)
 
@@ -93,6 +93,11 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		AuthorizationType: aws.String("NONE"),
 	}
 	_, err = svc.PutMethod(methodInput)
+	if err != nil {
+		log.Println(err)
+		rollback.ExecuteRollback()
+		return nil, err
+	}
 	rollback.ResourcesList = append(
 		rollback.ResourcesList,
 		method.ApiGatewayMethod{
@@ -101,11 +106,6 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 			RestApiId:  *input.HTTPCreateEvent.ApiId,
 		},
 	)
-	if err != nil {
-		log.Println(err)
-		rollback.ExecuteRollback()
-		return nil, err
-	}
 
 	time.Sleep(utils.ShortSleep * time.Millisecond)
 
@@ -121,6 +121,11 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		Uri:                   aws.String("arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations"),
 	}
 	_, err = svc.PutIntegration(integrationInput)
+	if err != nil {
+		log.Println(err)
+		rollback.ExecuteRollback()
+		return nil, err
+	}
 	rollback.ResourcesList = append(
 		rollback.ResourcesList,
 		integration.ApiGatewayIntegration{
@@ -133,11 +138,6 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 			Type:                  "AWS_PROXY",
 		},
 	)
-	if err != nil {
-		log.Println(err)
-		rollback.ExecuteRollback()
-		return nil, err
-	}
 
 	out := make(map[string]interface{})
 	out["RestApiId"] = *input.HTTPCreateEvent.ApiId
