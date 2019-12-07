@@ -1,8 +1,8 @@
 package rollback
 
 import (
-	resource "github.com/alessandromr/go-serverless-client/resource"
-	"github.com/alessandromr/go-serverless-client/utils"
+	resource "github.com/alessandromr/go-aws-serverless/resource"
+	"github.com/alessandromr/go-aws-serverless/utils"
 )
 
 //ResourcesList is a list of AWS resources ready to be rollbacked

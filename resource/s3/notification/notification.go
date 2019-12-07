@@ -1,7 +1,7 @@
 package notification
 
 import (
-	"github.com/alessandromr/go-serverless-client/utils/auth"
+	"github.com/alessandromr/go-aws-serverless/utils/auth"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 

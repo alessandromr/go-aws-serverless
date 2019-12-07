@@ -1,4 +1,4 @@
-module github.com/alessandromr/go-serverless-client
+module github.com/alessandromr/go-aws-serverless
 
 go 1.13
 

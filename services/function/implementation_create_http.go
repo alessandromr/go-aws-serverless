@@ -4,13 +4,13 @@ import (
 	"log"
 	"time"
 
-	"github.com/alessandromr/go-serverless-client/manager/rollback"
-	"github.com/alessandromr/go-serverless-client/resource/apigateway/integration"
-	"github.com/alessandromr/go-serverless-client/resource/apigateway/method"
-	"github.com/alessandromr/go-serverless-client/resource/apigateway/resource"
-	"github.com/alessandromr/go-serverless-client/resource/apigateway/rest"
-	"github.com/alessandromr/go-serverless-client/utils"
-	"github.com/alessandromr/go-serverless-client/utils/auth"
+	"github.com/alessandromr/go-aws-serverless/manager/rollback"
+	"github.com/alessandromr/go-aws-serverless/resource/apigateway/integration"
+	"github.com/alessandromr/go-aws-serverless/resource/apigateway/method"
+	"github.com/alessandromr/go-aws-serverless/resource/apigateway/resource"
+	"github.com/alessandromr/go-aws-serverless/resource/apigateway/rest"
+	"github.com/alessandromr/go-aws-serverless/utils"
+	"github.com/alessandromr/go-aws-serverless/utils/auth"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
@@ -118,7 +118,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		RestApiId:             input.HTTPCreateEvent.ApiId,
 		ResourceId:            createResourceOutput.Id,
 		IntegrationHttpMethod: aws.String("POST"),
-		Uri:                   aws.String("arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations"),
+		Uri: aws.String("arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations"),
 	}
 	_, err = svc.PutIntegration(integrationInput)
 	if err != nil {

@@ -3,12 +3,12 @@ package function
 import (
 	"time"
 
-	"github.com/alessandromr/go-serverless-client/manager/rollback"
-	"github.com/alessandromr/go-serverless-client/resource/lambda/permission"
-	"github.com/alessandromr/go-serverless-client/resource/s3/notification"
-	"github.com/alessandromr/go-serverless-client/utils"
-	"github.com/alessandromr/go-serverless-client/utils/auth"
-	"github.com/alessandromr/go-serverless-client/utils/convert"
+	"github.com/alessandromr/go-aws-serverless/manager/rollback"
+	"github.com/alessandromr/go-aws-serverless/resource/lambda/permission"
+	"github.com/alessandromr/go-aws-serverless/resource/s3/notification"
+	"github.com/alessandromr/go-aws-serverless/utils"
+	"github.com/alessandromr/go-aws-serverless/utils/auth"
+	"github.com/alessandromr/go-aws-serverless/utils/convert"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/s3"

@@ -1,7 +1,7 @@
 package create
 
 import (
-	resource "github.com/alessandromr/go-serverless-client/resource"
+	resource "github.com/alessandromr/go-aws-serverless/resource"
 )
 
 //ResourcesList is a list of AWS resources ready to be created

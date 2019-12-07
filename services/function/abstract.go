@@ -1,7 +1,7 @@
 package function
 
 import (
-	"github.com/alessandromr/go-serverless-client/utils"
+	"github.com/alessandromr/go-aws-serverless/utils"
 	"time"
 )
 
