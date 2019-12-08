@@ -21,8 +21,7 @@ func (input S3ReadFunctionInput) ReadDependencies(lambdaResult *lambda.FunctionC
 
 	out := make(map[string]interface{})
 	out["Bucket"] = *input.S3ReadEvent.Bucket
-	out["Events"] = response.LambdaFunctionConfigurations.Events
-	out["EventLambdaArn"] = response.LambdaFunctionConfigurations.LambdaFunctionArn
+	out["LambdaFunctionConfigurations"] = response.LambdaFunctionConfigurations
 	return out
 }
 
