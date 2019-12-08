@@ -56,7 +56,7 @@ func DeleteFunction(input DeleteFunctionInput) {
 }
 
 // ReadFunction will return the function and all the dependencies details
-func ReadFunction(input ReadFunctionInput) map[string]interface{} {
+func ReadFunction(input ReadFunctionInput) (map[string]interface{}, error) {
 	var out map[string]interface{}
 
 	//Create Lambda Client
@@ -66,12 +66,14 @@ func ReadFunction(input ReadFunctionInput) map[string]interface{} {
 	//Read lambda function
 	utils.InfoLog.Println("Reading The Lambda Function")
 	funcResponse, err := svc.GetFunctionConfiguration(lambdaConf)
-	utils.CheckErr(err)
+	if err != nil {
+		return nil, err
+	}
 
 	//Read Dependencies
 	utils.InfoLog.Println("Reading The Dependencies")
 	out = input.ReadDependencies(funcResponse)
 
 	out["FunctionArn"] = *funcResponse.FunctionArn
-	return out
+	return out, nil
 }
