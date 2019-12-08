@@ -75,5 +75,22 @@ func ReadFunction(input ReadFunctionInput) (map[string]interface{}, error) {
 	out = input.ReadDependencies(funcResponse)
 
 	out["FunctionArn"] = *funcResponse.FunctionArn
+	out["Role"] = *funcResponse.Role
+	out["FunctionName"] = *funcResponse.FunctionName 
+	out["Handler"] = *funcResponse.Handler
+	out["MemorySize"] = *funcResponse.MemorySize 
+	out["Runtime"] = *funcResponse.Runtime 
+	out["Timeout"] = *funcResponse.Timeout 
+	out["Version"] = *funcResponse.Version 
+	out["LastModified"] = *funcResponse.LastModified 
+	out["CodeSha256"] = *funcResponse.CodeSha256 
+	out["CodeSize"] = *funcResponse.CodeSize
+	out["Description"] = *funcResponse.Description 
+
+	out["TracingConfig"] = *funcResponse.TracingConfig 
+	out["VpcConfig"] = *funcResponse.VpcConfig 
+	out["Layers"] = *funcResponse.Layers 
+	out["Environment"] = *funcResponse.Environment 
+	out["DeadLetterConfig"] = *funcResponse.DeadLetterConfig 
 	return out, nil
 }
