@@ -7,7 +7,7 @@ import (
 )
 
 // CreateFunction will create function and all the dependencies
-func CreateFunction(input CreateFunctionInput) map[string]interface{} {
+func CreateFunction(input CreateFunctionInput) (map[string]interface{}, error) {
 	var err error
 	//Create response Object
 	out := make(map[string]interface{})
@@ -31,12 +31,12 @@ func CreateFunction(input CreateFunctionInput) map[string]interface{} {
 			FunctionName: lambdaConf.FunctionArn,
 		})
 		utils.CheckAWSErrExpect404(lerr, "Lambda Function")
-		return nil
+		return nil, err
 	}
 
 	//Create Output
 	out["FunctionArn"] = *lambdaConf.FunctionArn
-	return out
+	return out, nil
 }
 
 // DeleteFunction will delete the function and all the dependencies

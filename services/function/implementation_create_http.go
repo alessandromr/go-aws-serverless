@@ -118,7 +118,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		RestApiId:             input.HTTPCreateEvent.ApiId,
 		ResourceId:            createResourceOutput.Id,
 		IntegrationHttpMethod: aws.String("POST"),
-		Uri: aws.String("arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations"),
+		Uri:                   aws.String("arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations"),
 	}
 	_, err = svc.PutIntegration(integrationInput)
 	if err != nil {
