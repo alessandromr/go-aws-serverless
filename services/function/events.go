@@ -4,7 +4,7 @@ package function
 type S3CreateEvent struct {
 	Bucket *string
 	Prefix *string
-	Suffic *string
+	Suffix *string
 	Types  []*string
 	Key    *string
 }
