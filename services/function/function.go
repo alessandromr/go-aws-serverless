@@ -87,10 +87,10 @@ func ReadFunction(input ReadFunctionInput) (map[string]interface{}, error) {
 	out["CodeSize"] = *funcResponse.CodeSize
 	out["Description"] = *funcResponse.Description
 
-	out["TracingConfig"] = *funcResponse.TracingConfig
-	out["VpcConfig"] = *funcResponse.VpcConfig
-	out["Layers"] = funcResponse.Layers
-	out["Environment"] = *funcResponse.Environment
-	out["DeadLetterConfig"] = *funcResponse.DeadLetterConfig
+	// out["TracingConfig"] = *funcResponse.TracingConfig
+	// out["VpcConfig"] = *funcResponse.VpcConfig
+	// out["Layers"] = funcResponse.Layers
+	// out["Environment"] = *funcResponse.Environment
+	// out["DeadLetterConfig"] = *funcResponse.DeadLetterConfig
 	return out, nil
 }
