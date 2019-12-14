@@ -11,7 +11,8 @@ import (
 
 //ReadDependencies implements the dependencies deletion for HTTP Event
 func (input HTTPReadFunctionInput) ReadDependencies(lambdaResult *lambda.FunctionConfiguration) map[string]interface{} {
-	svc := apigateway.New(auth.Sess)
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.Apigatewayconn
 	var err error
 
 	//get integration

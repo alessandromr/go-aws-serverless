@@ -13,7 +13,8 @@ type ApiGatewayMethod struct {
 
 //Delete the given resources
 func (resource ApiGatewayMethod) Delete() error {
-	svc := apigateway.New(auth.Sess)
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.Apigatewayconn
 	methodInput := &apigateway.DeleteMethodInput{
 		HttpMethod: &resource.HttpMethod,
 		ResourceId: &resource.ResourceId,

@@ -13,7 +13,8 @@ type LambdaPermission struct {
 
 //Delete the given resources
 func (resource LambdaPermission) Delete() error {
-	svc := lambda.New(auth.Sess)
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.Lambdaconn
 	permissionsInput := &lambda.RemovePermissionInput{
 		FunctionName: &resource.FunctionName,
 		StatementId:  &resource.StatementId,

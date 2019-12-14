@@ -16,8 +16,9 @@ import (
 
 //CreateDependencies create all the dependencies for S3Event
 func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) (map[string]interface{}, error) {
-	svc := s3.New(auth.Sess)
-	lambdaClient := lambda.New(auth.Sess)
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.S3conn
+	lambdaClient := auth.Client.Lambdaconn
 	var err error
 
 	//lambda.AddPermission

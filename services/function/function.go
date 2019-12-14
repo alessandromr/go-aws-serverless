@@ -12,8 +12,9 @@ func CreateFunction(input CreateFunctionInput) (map[string]interface{}, error) {
 	//Create response Object
 	out := make(map[string]interface{})
 
-	//Create Lambda Client
-	svc := lambda.New(auth.Sess)
+	//Create Client
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.Lambdaconn
 
 	//Create lambda function
 	utils.InfoLog.Println("Creating The Lambda Function")
@@ -42,7 +43,8 @@ func CreateFunction(input CreateFunctionInput) (map[string]interface{}, error) {
 // DeleteFunction will delete the function and all the dependencies
 func DeleteFunction(input DeleteFunctionInput) {
 	//Create Lambda Client
-	svc := lambda.New(auth.Sess)
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.Lambdaconn
 	lambdaConf := input.GetFunctionInput()
 
 	//Delete Dependencies
@@ -60,7 +62,8 @@ func ReadFunction(input ReadFunctionInput) (map[string]interface{}, error) {
 	var out map[string]interface{}
 
 	//Create Lambda Client
-	svc := lambda.New(auth.Sess)
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.Lambdaconn
 	lambdaConf := input.GetFunctionConfiguration()
 
 	//Read lambda function

@@ -15,7 +15,8 @@ type ApiGatewayResource struct {
 
 //Delete the given resources
 func (resource ApiGatewayResource) Delete() error {
-	svc := apigateway.New(auth.Sess)
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.Apigatewayconn
 	resourceInput := &apigateway.DeleteResourceInput{
 		ResourceId: &resource.ResourceId,
 		RestApiId:  &resource.RestApiId,
