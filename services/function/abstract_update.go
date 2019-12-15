@@ -6,7 +6,7 @@ import (
 
 //UpdateFunctionInput is an interface to Update a serverless function and the relative trigger
 type UpdateFunctionInput interface {
-	UpdateDependencies(*lambda.FunctionConfiguration) map[string]interface{}
+	UpdateDependencies(*lambda.FunctionConfiguration) (map[string]interface{}, error)
 	GetUpdateFunctionConfiguration() *lambda.UpdateFunctionConfigurationInput
 }
 

@@ -9,7 +9,7 @@ import (
 )
 
 //UpdateDependencies create all the dependencies for the HTTPEvent
-func (input HTTPUpdateFunctionInput) UpdateDependencies(lambdaResult *lambda.FunctionConfiguration) {
+func (input HTTPUpdateFunctionInput) UpdateDependencies(lambdaResult *lambda.FunctionConfiguration) (map[string]interface{}, error) {
 	auth.MakeClient(auth.Sess)
 	svc := auth.Client.ApigatewayConn
 	var err error
@@ -25,7 +25,8 @@ func (input HTTPUpdateFunctionInput) UpdateDependencies(lambdaResult *lambda.Fun
 	if err != nil {
 		log.Println("Error") //ToDo
 	}
-
+	out := make(map[string]interface{})
+	return out, nil
 }
 
 //GetUpdateFunctionConfiguration return the UpdateFunctionConfigurationInput from the custom input
