@@ -25,7 +25,7 @@ type SQSQueue struct {
 //Delete the given resources
 func (resource SQSQueue) Delete() error {
 	auth.MakeClient(auth.Sess)
-	svc := auth.Client.SQSconn
+	svc := auth.Client.SQSConn
 
 	deleteQueueInput := &sqs.DeleteQueueInput{
 		QueueUrl: resource.QueueUrl,

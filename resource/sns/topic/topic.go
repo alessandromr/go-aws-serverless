@@ -18,7 +18,7 @@ type SNSTopic struct {
 //Delete the given resources
 func (resource SNSTopic) Delete() error {
 	auth.MakeClient(auth.Sess)
-	svc := auth.Client.SNSconn
+	svc := auth.Client.SNSConn
 
 	deleteTopicInput := &sns.DeleteTopicInput{
 		TopicArn: resource.TopicArn,

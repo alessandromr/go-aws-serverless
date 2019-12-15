@@ -14,7 +14,7 @@ func CreateFunction(input CreateFunctionInput) (map[string]interface{}, error) {
 
 	//Create Client
 	auth.MakeClient(auth.Sess)
-	svc := auth.Client.Lambdaconn
+	svc := auth.Client.LambdaConn
 
 	//Create lambda function
 	utils.InfoLog.Println("Creating The Lambda Function")
@@ -44,7 +44,7 @@ func CreateFunction(input CreateFunctionInput) (map[string]interface{}, error) {
 func DeleteFunction(input DeleteFunctionInput) {
 	//Create Lambda Client
 	auth.MakeClient(auth.Sess)
-	svc := auth.Client.Lambdaconn
+	svc := auth.Client.LambdaConn
 	lambdaConf := input.GetFunctionInput()
 
 	//Delete Dependencies
@@ -63,7 +63,7 @@ func ReadFunction(input ReadFunctionInput) (map[string]interface{}, error) {
 
 	//Create Lambda Client
 	auth.MakeClient(auth.Sess)
-	svc := auth.Client.Lambdaconn
+	svc := auth.Client.LambdaConn
 	lambdaConf := input.GetFunctionConfiguration()
 
 	//Read lambda function
@@ -106,7 +106,7 @@ func UpdateFunction(input UpdateFunctionInput) (map[string]interface{}, error) {
 
 	//Create Client
 	auth.MakeClient(auth.Sess)
-	svc := auth.Client.Lambdaconn
+	svc := auth.Client.LambdaConn
 
 	//Create lambda function
 	utils.InfoLog.Println("Updating The Lambda Function")

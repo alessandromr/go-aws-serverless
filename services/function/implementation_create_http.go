@@ -19,7 +19,7 @@ import (
 //CreateDependencies create all the dependencies for the HTTPEvent
 func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) (map[string]interface{}, error) {
 	auth.MakeClient(auth.Sess)
-	svc := auth.Client.Apigatewayconn
+	svc := auth.Client.ApigatewayConn
 	var err error
 
 	//apigateway.CreateRestApi

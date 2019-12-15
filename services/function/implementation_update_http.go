@@ -11,7 +11,7 @@ import (
 //UpdateDependencies create all the dependencies for the HTTPEvent
 func (input HTTPUpdateFunctionInput) UpdateDependencies(lambdaResult *lambda.FunctionConfiguration) {
 	auth.MakeClient(auth.Sess)
-	svc := auth.Client.Apigatewayconn
+	svc := auth.Client.ApigatewayConn
 	var err error
 
 	//Update integration between lambda and api gateway method

@@ -16,7 +16,7 @@ type S3NotificationConfiguration struct {
 //Delete the given resources
 func (resource S3NotificationConfiguration) Delete() error {
 	auth.MakeClient(auth.Sess)
-	svc := auth.Client.S3conn
+	svc := auth.Client.S3Conn
 	putNotConfig := &s3.PutBucketNotificationConfigurationInput{
 		Bucket: &resource.Bucket,
 		NotificationConfiguration: &s3.NotificationConfiguration{

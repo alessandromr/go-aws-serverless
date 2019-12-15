@@ -13,8 +13,8 @@ import (
 //UpdateDependencies implements the dependencies deletion for S3 Event
 func (input S3UpdateFunctionInput) UpdateDependencies(lambdaResult *lambda.FunctionConfiguration) {
 	auth.MakeClient(auth.Sess)
-	svc := auth.Client.S3conn
-	lambdaClient := auth.Client.Lambdaconn
+	svc := auth.Client.S3Conn
+	lambdaClient := auth.Client.LambdaConn
 	var err error
 
 	//lambda.RemovePermission (remove old permission)

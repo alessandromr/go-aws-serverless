@@ -14,23 +14,23 @@ import (
 var Client AWSClient
 
 type AWSClient struct {
-	Apigatewayconn       *apigateway.APIGateway
-	Apigatewayv2conn     *apigatewayv2.ApiGatewayV2
-	Lambdaconn           *lambda.Lambda
-	S3conn               *s3.S3
-	SQSconn              *sqs.SQS
-	SNSconn              *sns.SNS
+	ApigatewayConn       *apigateway.APIGateway
+	Apigatewayv2Conn     *apigatewayv2.ApiGatewayV2
+	LambdaConn           *lambda.Lambda
+	S3Conn               *s3.S3
+	SQSConn              *sqs.SQS
+	SNSConn              *sns.SNS
 	CloudwatchEventsConn *cloudwatchevents.CloudWatchEvents
 }
 
 func MakeClient(sess *session.Session) {
 	Client = AWSClient{
-		Apigatewayconn:       apigateway.New(sess),
-		Apigatewayv2conn:     apigatewayv2.New(sess),
-		Lambdaconn:           lambda.New(sess),
-		S3conn:               s3.New(sess),
-		SQSconn:              sqs.New(sess),
-		SNSconn:              sns.New(sess),
+		ApigatewayConn:       apigateway.New(sess),
+		Apigatewayv2Conn:     apigatewayv2.New(sess),
+		LambdaConn:           lambda.New(sess),
+		S3Conn:               s3.New(sess),
+		SQSConn:              sqs.New(sess),
+		SNSConn:              sns.New(sess),
 		CloudwatchEventsConn: cloudwatchevents.New(sess),
 	}
 }

@@ -10,7 +10,7 @@ import (
 //ReadDependencies implements the dependencies deletion for S3 Event
 func (input S3ReadFunctionInput) ReadDependencies(lambdaResult *lambda.FunctionConfiguration) map[string]interface{} {
 	auth.MakeClient(auth.Sess)
-	svc := auth.Client.S3conn
+	svc := auth.Client.S3Conn
 
 	notInput := &s3.GetBucketNotificationConfigurationRequest{
 		Bucket: input.S3ReadEvent.Bucket,
