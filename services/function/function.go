@@ -12,8 +12,9 @@ func CreateFunction(input CreateFunctionInput) (map[string]interface{}, error) {
 	//Create response Object
 	out := make(map[string]interface{})
 
-	//Create Lambda Client
-	svc := lambda.New(auth.Sess)
+	//Create Client
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.LambdaConn
 
 	//Create lambda function
 	utils.InfoLog.Println("Creating The Lambda Function")
@@ -42,7 +43,8 @@ func CreateFunction(input CreateFunctionInput) (map[string]interface{}, error) {
 // DeleteFunction will delete the function and all the dependencies
 func DeleteFunction(input DeleteFunctionInput) {
 	//Create Lambda Client
-	svc := lambda.New(auth.Sess)
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.LambdaConn
 	lambdaConf := input.GetFunctionInput()
 
 	//Delete Dependencies
@@ -60,7 +62,8 @@ func ReadFunction(input ReadFunctionInput) (map[string]interface{}, error) {
 	var out map[string]interface{}
 
 	//Create Lambda Client
-	svc := lambda.New(auth.Sess)
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.LambdaConn
 	lambdaConf := input.GetFunctionConfiguration()
 
 	//Read lambda function
@@ -92,5 +95,29 @@ func ReadFunction(input ReadFunctionInput) (map[string]interface{}, error) {
 	// out["Layers"] = funcResponse.Layers
 	// out["Environment"] = *funcResponse.Environment
 	// out["DeadLetterConfig"] = *funcResponse.DeadLetterConfig
+	return out, nil
+}
+
+// UpdateFunction will update function and all the dependencies
+func UpdateFunction(input UpdateFunctionInput) (map[string]interface{}, error) {
+	var err error
+	//Create response Object
+	out := make(map[string]interface{})
+
+	//Create Client
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.LambdaConn
+
+	//Create lambda function
+	utils.InfoLog.Println("Updating The Lambda Function")
+	lambdaConf, err := svc.UpdateFunctionConfiguration(input.GetUpdateFunctionConfiguration())
+	utils.CheckErr(err)
+
+	//Updating Dependencies
+	utils.InfoLog.Println("Updating The Dependencies")
+	input.UpdateDependencies(lambdaConf)
+
+	//Create Output
+	out["FunctionArn"] = *lambdaConf.FunctionArn
 	return out, nil
 }

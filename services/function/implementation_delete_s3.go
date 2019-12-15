@@ -10,9 +10,12 @@ import (
 
 //DeleteDependencies implements the dependencies deletion for S3 Event
 func (input S3DeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.DeleteFunctionInput) {
-	svc := s3.New(auth.Sess)
-	lambdaClient := lambda.New(auth.Sess)
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.S3Conn
+	lambdaClient := auth.Client.LambdaConn
 	var err error
+
+	time.Sleep(utils.LongSleep * time.Millisecond)
 
 	//Remove BucketNotificationConfiguration by setting to empty
 	//s3.PutBucketNotificationConfiguration

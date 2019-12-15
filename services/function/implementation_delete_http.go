@@ -10,8 +10,11 @@ import (
 
 //DeleteDependencies implements the dependencies deletion for HTTP Event
 func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.DeleteFunctionInput) {
-	svc := apigateway.New(auth.Sess)
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.ApigatewayConn
 	var err error
+
+	time.Sleep(utils.LongSleep * time.Millisecond)
 
 	//delete existing integration
 	integrationInput := &apigateway.DeleteIntegrationInput{

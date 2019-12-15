@@ -2,6 +2,7 @@ package resource
 
 import (
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 )
 
@@ -13,9 +14,26 @@ type ApiGatewayResource struct {
 	RestApiId  string
 }
 
+//Create the given resources
+func (resource *ApiGatewayResource) Create() error {
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.ApigatewayConn
+
+	resourceInput := &apigateway.CreateResourceInput{
+		PathPart:  aws.String(resource.Path),
+		RestApiId: aws.String(resource.RestApiId),
+		ParentId:  aws.String(resource.ParentId),
+	}
+
+	createResourceOutput, err := svc.CreateResource(resourceInput)
+	resource.ResourceId = *createResourceOutput.Id
+	return err
+}
+
 //Delete the given resources
-func (resource ApiGatewayResource) Delete() error {
-	svc := apigateway.New(auth.Sess)
+func (resource *ApiGatewayResource) Delete() error {
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.ApigatewayConn
 	resourceInput := &apigateway.DeleteResourceInput{
 		ResourceId: &resource.ResourceId,
 		RestApiId:  &resource.RestApiId,
