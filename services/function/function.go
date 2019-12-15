@@ -97,3 +97,27 @@ func ReadFunction(input ReadFunctionInput) (map[string]interface{}, error) {
 	// out["DeadLetterConfig"] = *funcResponse.DeadLetterConfig
 	return out, nil
 }
+
+// UpdateFunction will update function and all the dependencies
+func UpdateFunction(input UpdateFunctionInput) (map[string]interface{}, error) {
+	var err error
+	//Create response Object
+	out := make(map[string]interface{})
+
+	//Create Client
+	auth.MakeClient(auth.Sess)
+	svc := auth.Client.Lambdaconn
+
+	//Create lambda function
+	utils.InfoLog.Println("Updating The Lambda Function")
+	lambdaConf, err := svc.UpdateFunctionConfiguration(input.GetUpdateFunctionConfiguration())
+	utils.CheckErr(err)
+
+	//Updating Dependencies
+	utils.InfoLog.Println("Updating The Dependencies")
+	input.UpdateDependencies(lambdaConf)
+
+	//Create Output
+	out["FunctionArn"] = *lambdaConf.FunctionArn
+	return out, nil
+}
