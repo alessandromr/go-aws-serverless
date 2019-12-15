@@ -1,16 +1,20 @@
 package function
 
 import (
+	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"log"
+	"time"
 )
 
 //ReadDependencies implements the dependencies deletion for S3 Event
 func (input S3ReadFunctionInput) ReadDependencies(lambdaResult *lambda.FunctionConfiguration) map[string]interface{} {
 	auth.MakeClient(auth.Sess)
 	svc := auth.Client.S3Conn
+
+	time.Sleep(utils.LongSleep * time.Millisecond)
 
 	notInput := &s3.GetBucketNotificationConfigurationRequest{
 		Bucket: input.S3ReadEvent.Bucket,

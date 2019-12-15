@@ -21,6 +21,8 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 	lambdaClient := auth.Client.LambdaConn
 	var err error
 
+	time.Sleep(utils.LongSleep * time.Millisecond)
+
 	//lambda.AddPermission
 	permissionsInput := &lambda.AddPermissionInput{
 		Action:       aws.String("lambda:InvokeFunction"),
@@ -69,12 +71,14 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 			FunctionArn: *lambdaResult.FunctionArn,
 		},
 	)
+
+	time.Sleep(utils.LongSleep * time.Millisecond)
+
 	out := make(map[string]interface{})
 	out["Bucket"] = *input.S3CreateEvent.Bucket
 	out["StatementId"] = "S3Event_" + *input.S3CreateEvent.Bucket + "_" + *lambdaResult.FunctionName //ToDo improve
 	out["LambdaPermission"] = permissionsOutput.Statement
 	return out, nil
-
 }
 
 //GetFunctionInput return the CreateFunctionInput from the custom input

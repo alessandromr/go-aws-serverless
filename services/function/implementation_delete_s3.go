@@ -15,6 +15,8 @@ func (input S3DeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Delet
 	lambdaClient := auth.Client.LambdaConn
 	var err error
 
+	time.Sleep(utils.LongSleep * time.Millisecond)
+
 	//Remove BucketNotificationConfiguration by setting to empty
 	//s3.PutBucketNotificationConfiguration
 	putNotConfig := &s3.PutBucketNotificationConfigurationInput{

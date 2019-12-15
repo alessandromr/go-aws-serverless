@@ -3,6 +3,7 @@ package rollback
 import (
 	resource "github.com/alessandromr/go-aws-serverless/resource"
 	"github.com/alessandromr/go-aws-serverless/utils"
+	"time"
 )
 
 //ResourcesList is a list of AWS resources ready to be rollbacked
@@ -13,5 +14,6 @@ func ExecuteRollback() {
 	for _, v := range ResourcesList {
 		utils.ErrLog.Printf("Rollback %T\n", v)
 		v.Delete()
+		time.Sleep(utils.LongSleep * time.Millisecond)
 	}
 }

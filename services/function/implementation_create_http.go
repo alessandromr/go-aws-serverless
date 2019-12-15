@@ -22,6 +22,8 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	svc := auth.Client.ApigatewayConn
 	var err error
 
+	time.Sleep(utils.LongSleep * time.Millisecond)
+
 	//apigateway.CreateRestApi
 	if !input.HTTPCreateEvent.Existing {
 		apiInput := &apigateway.CreateRestApiInput{
@@ -139,6 +141,8 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 			Type:                  "AWS_PROXY",
 		},
 	)
+
+	time.Sleep(utils.LongSleep * time.Millisecond)
 
 	out := make(map[string]interface{})
 	out["RestApiId"] = *input.HTTPCreateEvent.ApiId

@@ -17,6 +17,8 @@ func (input S3UpdateFunctionInput) UpdateDependencies(lambdaResult *lambda.Funct
 	lambdaClient := auth.Client.LambdaConn
 	var err error
 
+	time.Sleep(utils.LongSleep * time.Millisecond)
+
 	//lambda.RemovePermission (remove old permission)
 	removePermissionsInput := &lambda.RemovePermissionInput{
 		FunctionName: lambdaResult.FunctionName,

@@ -14,6 +14,8 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 	svc := auth.Client.ApigatewayConn
 	var err error
 
+	time.Sleep(utils.LongSleep * time.Millisecond)
+
 	//delete existing integration
 	integrationInput := &apigateway.DeleteIntegrationInput{
 		HttpMethod: input.HTTPDeleteEvent.Method,

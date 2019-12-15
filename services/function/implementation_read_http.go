@@ -15,6 +15,8 @@ func (input HTTPReadFunctionInput) ReadDependencies(lambdaResult *lambda.Functio
 	svc := auth.Client.ApigatewayConn
 	var err error
 
+	time.Sleep(utils.LongSleep * time.Millisecond)
+
 	//get integration
 	//get method
 	//get resource

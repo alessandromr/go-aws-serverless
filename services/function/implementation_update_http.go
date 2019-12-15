@@ -3,9 +3,11 @@ package function
 import (
 	"log"
 
+	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
+	"time"
 )
 
 //UpdateDependencies create all the dependencies for the HTTPEvent
@@ -13,6 +15,8 @@ func (input HTTPUpdateFunctionInput) UpdateDependencies(lambdaResult *lambda.Fun
 	auth.MakeClient(auth.Sess)
 	svc := auth.Client.ApigatewayConn
 	var err error
+
+	time.Sleep(utils.LongSleep * time.Millisecond)
 
 	//Update integration between lambda and api gateway method
 	//apigateway.UpdateIntegration
