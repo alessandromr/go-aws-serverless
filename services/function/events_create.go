@@ -18,3 +18,19 @@ type HTTPCreateEvent struct {
 	ApiName       *string
 	ExecutionRole *string
 }
+
+//SQSCreateEvent SQS trigger of a lambda function
+type SQSCreateEvent struct {
+	Existing                      bool
+	QueueName                     *string
+	DelaySeconds                  *int
+	MaximumMessageSize            *int
+	MessageRetentionPeriod        *int
+	ReceiveMessageWaitTimeSeconds *int
+	VisibilityTimeout             *int
+	FifoQueue                     bool
+	KmsMasterKeyId                *string
+	ContentBasedDeduplication     bool
+	// Policy
+	// RedrivePolicy
+}

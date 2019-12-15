@@ -12,3 +12,8 @@ type HTTPReadEvent struct {
 	ResourceId *string
 	Method     *string
 }
+
+//SQSReadEvent SQS trigger of a lambda function
+type SQSReadEvent struct {
+	QueueUrl *string
+}

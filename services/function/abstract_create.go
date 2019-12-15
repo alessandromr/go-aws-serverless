@@ -23,3 +23,10 @@ type S3CreateFunctionInput struct {
 	FunctionInput *lambda.CreateFunctionInput
 	S3CreateEvent
 }
+
+//SQSCreateFunctionInput is an implementation of CreateFunctionInput
+//Create serveless function with SQS as trigger
+type SQSCreateFunctionInput struct {
+	FunctionInput *lambda.CreateFunctionInput
+	SQSCreateEvent
+}

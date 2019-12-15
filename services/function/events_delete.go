@@ -12,3 +12,9 @@ type HTTPDeleteEvent struct {
 	ResourceId *string
 	Method     *string
 }
+
+//SQSDeleteEvent SQS trigger of a lambda function
+type SQSDeleteEvent struct {
+	Existing bool
+	QueueUrl *string
+}
