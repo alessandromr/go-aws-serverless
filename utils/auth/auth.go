@@ -17,6 +17,7 @@ func StartSessionWithShared(region string, profile string) {
 	})
 	utils.CheckErr(err)
 	Sess = tmp
+	Region = region
 }
 
 func StartSession(region string) {
@@ -25,6 +26,7 @@ func StartSession(region string) {
 	})
 	utils.CheckErr(err)
 	Sess = tmp
+	Region = region
 }
 
 func SetRegion(region string) {
