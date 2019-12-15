@@ -67,6 +67,12 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		&apiResource,
 	)
 
+	//Create Rest Resource 
+	err = create.ExecutePartial()
+	if err != nil {
+		return nil, err
+	}
+
 	//apigateway.PutMethod
 	apiMethod := method.ApiGatewayMethod{
 		HttpMethod: *input.HTTPCreateEvent.Method,
