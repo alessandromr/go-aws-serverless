@@ -1,17 +1,15 @@
 package function
 
 import (
-	"log"
 	"time"
 
-	"github.com/alessandromr/go-aws-serverless/manager/rollback"
+	"github.com/alessandromr/go-aws-serverless/manager/create"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/integration"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/method"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/resource"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/rest"
 	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
 )
@@ -22,39 +20,30 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	svc := auth.Client.ApigatewayConn
 	var err error
 
-	time.Sleep(utils.LongSleep * time.Millisecond)
-
 	//apigateway.CreateRestApi
 	if !input.HTTPCreateEvent.Existing {
-		apiInput := &apigateway.CreateRestApiInput{
-			Name: input.HTTPCreateEvent.ApiName,
+		restAPI := rest.ApiGatewayRestApi{
+			ApiName: *input.HTTPCreateEvent.ApiName,
 		}
-		response, err := svc.CreateRestApi(apiInput)
-		if err != nil {
-			return nil, err
-		}
-		rollback.ResourcesList = append(
-			rollback.ResourcesList,
-			&rest.ApiGatewayRestApi{
-				RestApiId: *response.Id,
-				ApiName:   *input.HTTPCreateEvent.ApiName,
-			},
+		create.ResourcesList = append(
+			create.ResourcesList,
+			&restAPI,
 		)
-		input.HTTPCreateEvent.ApiId = response.Id
+		input.HTTPCreateEvent.ApiId = &restAPI.RestApiId
 	}
-
-	time.Sleep(utils.ShortSleep * time.Millisecond)
+	create.ExecutePartial()
 
 	//Get Root Resource
 	//apigateway.GetResources
 	getResourceInput := &apigateway.GetResourcesInput{
 		RestApiId: input.HTTPCreateEvent.ApiId,
 	}
+	time.Sleep(utils.ShortSleep * time.Millisecond)
 	getResourceOutput, err := svc.GetResources(getResourceInput)
+	time.Sleep(utils.ShortSleep * time.Millisecond)
 	if err != nil {
 		return nil, err
 	}
-
 	var rootParent string
 	for _, v := range getResourceOutput.Items {
 		if *v.Path == "/" {
@@ -62,92 +51,48 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		}
 	}
 
-	time.Sleep(utils.ShortSleep * time.Millisecond)
-
 	//apigateway.CreateResource
-	resourceInput := &apigateway.CreateResourceInput{
-		PathPart:  input.HTTPCreateEvent.Path,
-		RestApiId: input.HTTPCreateEvent.ApiId,
-		ParentId:  aws.String(rootParent),
+	apiResource := resource.ApiGatewayResource{
+		RestApiId: *input.HTTPCreateEvent.ApiId,
+		Path:      *input.HTTPCreateEvent.Path,
+		ParentId:  rootParent,
 	}
-	createResourceOutput, err := svc.CreateResource(resourceInput)
-	if err != nil {
-		log.Println(err)
-		rollback.ExecuteRollback()
-		return nil, err
-	}
-	rollback.ResourcesList = append(
-		rollback.ResourcesList,
-		&resource.ApiGatewayResource{
-			ResourceId: *createResourceOutput.Id,
-			RestApiId:  *input.HTTPCreateEvent.ApiId,
-			Path:       *input.HTTPCreateEvent.Path,
-			ParentId:   rootParent,
-		},
+	create.ResourcesList = append(
+		create.ResourcesList,
+		&apiResource,
 	)
-
-	time.Sleep(utils.ShortSleep * time.Millisecond)
 
 	//apigateway.PutMethod
-	methodInput := &apigateway.PutMethodInput{
-		HttpMethod:        input.HTTPCreateEvent.Method,
-		RestApiId:         input.HTTPCreateEvent.ApiId,
-		ResourceId:        createResourceOutput.Id,
-		AuthorizationType: aws.String("NONE"),
+	apiMethod := method.ApiGatewayMethod{
+		HttpMethod: *input.HTTPCreateEvent.Method,
+		ResourceId: apiResource.ResourceId,
+		RestApiId:  *input.HTTPCreateEvent.ApiId,
 	}
-	_, err = svc.PutMethod(methodInput)
-	if err != nil {
-		log.Println(err)
-		rollback.ExecuteRollback()
-		return nil, err
-	}
-	rollback.ResourcesList = append(
-		rollback.ResourcesList,
-		&method.ApiGatewayMethod{
-			HttpMethod: *input.HTTPCreateEvent.Method,
-			ResourceId: *createResourceOutput.Id,
-			RestApiId:  *input.HTTPCreateEvent.ApiId,
-		},
+	create.ResourcesList = append(
+		create.ResourcesList,
+		&apiMethod,
 	)
-
-	time.Sleep(utils.ShortSleep * time.Millisecond)
 
 	//Put integration between lambda and api gateway method
 	//apigateway.PutIntegration
-	integrationInput := &apigateway.PutIntegrationInput{
-		Type:                  aws.String("AWS_PROXY"),
-		Credentials:           input.HTTPCreateEvent.ExecutionRole,
-		HttpMethod:            input.HTTPCreateEvent.Method,
-		RestApiId:             input.HTTPCreateEvent.ApiId,
-		ResourceId:            createResourceOutput.Id,
-		IntegrationHttpMethod: aws.String("POST"),
-		Uri:                   aws.String("arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations"),
+	apiIntegration := integration.ApiGatewayIntegration{
+		HttpMethod:            *input.HTTPCreateEvent.Method,
+		IntegrationHTTPMethod: "POST",
+		ResourceId:            apiResource.ResourceId,
+		RestApiId:             *input.HTTPCreateEvent.ApiId,
+		Uri:                   "arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations",
+		Credentials:           *input.HTTPCreateEvent.ExecutionRole,
+		Type:                  "AWS_PROXY",
 	}
-	_, err = svc.PutIntegration(integrationInput)
-	if err != nil {
-		log.Println(err)
-		rollback.ExecuteRollback()
-		return nil, err
-	}
-	rollback.ResourcesList = append(
-		rollback.ResourcesList,
-		&integration.ApiGatewayIntegration{
-			HttpMethod:            *input.HTTPCreateEvent.Method,
-			IntegrationHTTPMethod: "POST",
-			ResourceId:            *createResourceOutput.Id,
-			RestApiId:             *input.HTTPCreateEvent.ApiId,
-			Uri:                   "arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations",
-			Credentials:           *input.HTTPCreateEvent.ExecutionRole,
-			Type:                  "AWS_PROXY",
-		},
+	create.ResourcesList = append(
+		create.ResourcesList,
+		&apiIntegration,
 	)
-
-	time.Sleep(utils.LongSleep * time.Millisecond)
 
 	out := make(map[string]interface{})
 	out["RestApiId"] = *input.HTTPCreateEvent.ApiId
 	out["Method"] = *input.HTTPCreateEvent.Method
-	out["ResourceId"] = *createResourceOutput.Id
+	out["ResourceId"] = apiResource.ResourceId
 	return out, nil
 }
 

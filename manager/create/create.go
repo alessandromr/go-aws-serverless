@@ -24,3 +24,20 @@ func ExecuteCreate() {
 		}
 	}
 }
+
+//ExecutePartial will create all resources saved inside ResourcesList and remove them
+func ExecutePartial() {
+	time.Sleep(utils.LongSleep * time.Millisecond)
+	for _, v := range ResourcesList {
+		utils.InfoLog.Printf("Creating %T\n", v)
+		err := v.Create()
+		if err != nil {
+			rollback.ExecuteRollback()
+		} else {
+			rollback.ResourcesList = append(rollback.ResourcesList, v)
+			time.Sleep(utils.LongSleep * time.Millisecond)
+		}
+		ResourcesList = ResourcesList[1:]
+	}
+
+}
