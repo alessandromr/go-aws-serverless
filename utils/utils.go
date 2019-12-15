@@ -1,4 +1,4 @@
 package utils
 
-const ShortSleep = 400
-const LongSleep = 800
+const ShortSleep = 600
+const LongSleep = 1100
