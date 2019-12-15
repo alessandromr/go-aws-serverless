@@ -38,7 +38,7 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 	}
 	rollback.ResourcesList = append(
 		rollback.ResourcesList,
-		permission.LambdaPermission{
+		&permission.LambdaPermission{
 			StatementId:  "S3Event_" + *input.S3CreateEvent.Bucket + "_" + *lambdaResult.FunctionName,
 			FunctionName: *lambdaResult.FunctionArn,
 		},
@@ -65,7 +65,7 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 	}
 	rollback.ResourcesList = append(
 		rollback.ResourcesList,
-		notification.S3NotificationConfiguration{
+		&notification.S3NotificationConfiguration{
 			Bucket:      *input.S3CreateEvent.Bucket,
 			Events:      convert.StringSlice(input.S3CreateEvent.Types),
 			FunctionArn: *lambdaResult.FunctionArn,

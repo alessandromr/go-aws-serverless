@@ -35,7 +35,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		}
 		rollback.ResourcesList = append(
 			rollback.ResourcesList,
-			rest.ApiGatewayRestApi{
+			&rest.ApiGatewayRestApi{
 				RestApiId: *response.Id,
 				ApiName:   *input.HTTPCreateEvent.ApiName,
 			},
@@ -78,7 +78,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	}
 	rollback.ResourcesList = append(
 		rollback.ResourcesList,
-		resource.ApiGatewayResource{
+		&resource.ApiGatewayResource{
 			ResourceId: *createResourceOutput.Id,
 			RestApiId:  *input.HTTPCreateEvent.ApiId,
 			Path:       *input.HTTPCreateEvent.Path,
@@ -103,7 +103,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	}
 	rollback.ResourcesList = append(
 		rollback.ResourcesList,
-		method.ApiGatewayMethod{
+		&method.ApiGatewayMethod{
 			HttpMethod: *input.HTTPCreateEvent.Method,
 			ResourceId: *createResourceOutput.Id,
 			RestApiId:  *input.HTTPCreateEvent.ApiId,
@@ -131,7 +131,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	}
 	rollback.ResourcesList = append(
 		rollback.ResourcesList,
-		integration.ApiGatewayIntegration{
+		&integration.ApiGatewayIntegration{
 			HttpMethod:            *input.HTTPCreateEvent.Method,
 			IntegrationHTTPMethod: "POST",
 			ResourceId:            *createResourceOutput.Id,
