@@ -11,6 +11,7 @@ var ResourcesList []resource.AWSResource
 
 //ExecuteRollback will rollback (delete) all resources saved inside ResourcesList
 func ExecuteRollback() {
+	time.Sleep(utils.LongSleep * time.Millisecond)
 	for _, v := range ResourcesList {
 		utils.ErrLog.Printf("Rollback %T\n", v)
 		v.Delete()
