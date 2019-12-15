@@ -31,10 +31,10 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		)
 		input.HTTPCreateEvent.ApiId = &restAPI.RestApiId
 	}
-	
+
 	//Create Rest Api if necessary
 	err = create.ExecutePartial()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
@@ -96,7 +96,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 
 	//Create Resources
 	err = create.ExecuteCreate()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
