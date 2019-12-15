@@ -33,7 +33,10 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	}
 	
 	//Create Rest Api if necessary
-	create.ExecutePartial()
+	err = create.ExecutePartial()
+	if err != nil{
+		return nil, err
+	}
 
 	//Get Root Resource
 	//apigateway.GetResources
@@ -92,7 +95,10 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	)
 
 	//Create Resources
-	create.ExecuteCreate()
+	err = create.ExecuteCreate()
+	if err != nil{
+		return nil, err
+	}
 
 	out := make(map[string]interface{})
 	out["RestApiId"] = *input.HTTPCreateEvent.ApiId
