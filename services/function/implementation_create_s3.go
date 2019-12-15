@@ -17,8 +17,8 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 	permission := permission.LambdaPermission{
 		StatementId:  "S3Event_" + *input.S3CreateEvent.Bucket + "_" + *lambdaResult.FunctionName,
 		FunctionName: *lambdaResult.FunctionArn,
-		SourceArn:    "arn:aws:s3:::" + *input.S3CreateEvent.Bucket,	
-		Principal:    "s3.amazonaws.com",	
+		SourceArn:    "arn:aws:s3:::" + *input.S3CreateEvent.Bucket,
+		Principal:    "s3.amazonaws.com",
 		Action:       "lambda:InvokeFunction",
 	}
 	create.ResourcesList = append(
