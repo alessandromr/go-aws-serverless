@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/apigatewayv2"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
@@ -17,6 +18,7 @@ type AWSClient struct {
 	Lambdaconn       *lambda.Lambda
 	S3conn           *s3.S3
 	SQSconn          *sqs.SQS
+	SNSconn          *sns.SNS
 }
 
 func MakeClient(sess *session.Session) {
@@ -26,5 +28,6 @@ func MakeClient(sess *session.Session) {
 		Lambdaconn:       lambda.New(sess),
 		S3conn:           s3.New(sess),
 		SQSconn:          sqs.New(sess),
+		SNSconn:          sns.New(sess),
 	}
 }
