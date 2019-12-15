@@ -67,7 +67,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		&apiResource,
 	)
 
-	//Create Rest Resource 
+	//Create Rest Resource
 	err = create.ExecutePartial()
 	if err != nil {
 		return nil, err
