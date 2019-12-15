@@ -20,7 +20,8 @@ func (resource *ApiGatewayRestApi) Create() error {
 	apiInput := &apigateway.CreateRestApiInput{
 		Name: aws.String(resource.ApiName),
 	}
-	_, err := svc.CreateRestApi(apiInput)
+	response, err := svc.CreateRestApi(apiInput)
+	resource.RestApiId = *response.Id
 	return err
 }
 
