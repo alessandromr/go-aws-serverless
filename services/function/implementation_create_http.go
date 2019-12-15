@@ -31,6 +31,8 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		)
 		input.HTTPCreateEvent.ApiId = &restAPI.RestApiId
 	}
+	
+	//Create Rest Api if necessary
 	create.ExecutePartial()
 
 	//Get Root Resource
@@ -88,6 +90,9 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		create.ResourcesList,
 		&apiIntegration,
 	)
+
+	//Create Resources
+	create.ExecuteCreate()
 
 	out := make(map[string]interface{})
 	out["RestApiId"] = *input.HTTPCreateEvent.ApiId
