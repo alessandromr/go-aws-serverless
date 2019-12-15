@@ -71,6 +71,7 @@ func (input S3CreateFunctionInput) CreateDependencies(lambdaResult *lambda.Funct
 	)
 	out := make(map[string]interface{})
 	out["Bucket"] = *input.S3CreateEvent.Bucket
+	out["StatementId"] = "S3Event_" + *input.S3CreateEvent.Bucket + "_" + *lambdaResult.FunctionName //ToDo improve
 	out["LambdaPermission"] = permissionsOutput.Statement
 	return out, nil
 
