@@ -1,6 +1,7 @@
 package function
 
 import (
+	"log"
 	"time"
 
 	"github.com/alessandromr/go-aws-serverless/manager/create"
@@ -95,6 +96,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		Credentials:           *input.HTTPCreateEvent.ExecutionRole,
 		Type:                  "AWS_PROXY",
 	}
+	log.Println(apiIntegration)
 	create.ResourcesList = append(
 		create.ResourcesList,
 		&apiIntegration,
