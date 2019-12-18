@@ -24,6 +24,7 @@ func ExecuteCreate() error {
 			time.Sleep(utils.LongSleep * time.Millisecond)
 		}
 	}
+	ResourcesList = []resource.AWSResource{}
 	return nil
 }
 

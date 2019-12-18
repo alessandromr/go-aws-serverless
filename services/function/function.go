@@ -2,6 +2,7 @@ package function
 
 import (
 	"github.com/alessandromr/go-aws-serverless/utils"
+	"github.com/alessandromr/go-aws-serverless/manager"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
 	"github.com/aws/aws-sdk-go/service/lambda"
 )
@@ -9,6 +10,10 @@ import (
 // CreateFunction will create function and all the dependencies
 func CreateFunction(input CreateFunctionInput) (map[string]interface{}, error) {
 	var err error
+
+	//Remove all resources from singletons
+	defer manager.Clean()
+
 	//Create response Object
 	out := make(map[string]interface{})
 
@@ -42,6 +47,10 @@ func CreateFunction(input CreateFunctionInput) (map[string]interface{}, error) {
 
 // DeleteFunction will delete the function and all the dependencies
 func DeleteFunction(input DeleteFunctionInput) {
+
+	//Remove all resources from singletons
+	defer manager.Clean()
+
 	//Create Lambda Client
 	auth.MakeClient(auth.Sess)
 	svc := auth.Client.LambdaConn
@@ -59,6 +68,10 @@ func DeleteFunction(input DeleteFunctionInput) {
 
 // ReadFunction will return the function and all the dependencies details
 func ReadFunction(input ReadFunctionInput) (map[string]interface{}, error) {
+
+	//Remove all resources from singletons
+	defer manager.Clean()
+
 	var out map[string]interface{}
 
 	//Create Lambda Client
@@ -100,6 +113,10 @@ func ReadFunction(input ReadFunctionInput) (map[string]interface{}, error) {
 
 // UpdateFunction will update function and all the dependencies
 func UpdateFunction(input UpdateFunctionInput) (map[string]interface{}, error) {
+
+	//Remove all resources from singletons
+	defer manager.Clean()
+	
 	var err error
 	//Create response Object
 	out := make(map[string]interface{})
