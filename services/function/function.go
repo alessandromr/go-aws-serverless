@@ -1,8 +1,8 @@
 package function
 
 import (
-	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/manager"
+	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
 	"github.com/aws/aws-sdk-go/service/lambda"
 )
@@ -116,7 +116,7 @@ func UpdateFunction(input UpdateFunctionInput) (map[string]interface{}, error) {
 
 	//Remove all resources from singletons
 	defer manager.Clean()
-	
+
 	var err error
 	//Create response Object
 	out := make(map[string]interface{})
