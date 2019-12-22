@@ -1,7 +1,6 @@
 package function
 
 import (
-	"log"
 	"time"
 
 	"github.com/alessandromr/go-aws-serverless/manager/create"
