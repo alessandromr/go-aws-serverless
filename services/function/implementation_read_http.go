@@ -48,9 +48,9 @@ func (input HTTPReadFunctionInput) ReadDependencies(lambdaResult *lambda.Functio
 	utils.CheckErr(err)
 
 	out := make(map[string]interface{})
-	out["RestApi"] = restResponse
-	out["ApiResource"] = resourceResponse
-	out["ApiIntegration"] = integrationResponse
+	out["RestApi"] = *restResponse
+	out["ApiResource"] = *resourceResponse
+	out["ApiIntegration"] = *integrationResponse
 	return out
 }
 
