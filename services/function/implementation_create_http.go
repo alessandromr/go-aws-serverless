@@ -92,7 +92,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		IntegrationHTTPMethod: "POST",
 		ResourceId:            apiResource.ResourceId,
 		RestApiId:             *input.HTTPCreateEvent.ApiId,
-		Uri:                   "arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations",
+		Uri:                   "arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn,
 		Credentials:           *input.HTTPCreateEvent.ExecutionRole,
 		Type:                  "AWS_PROXY",
 	}
