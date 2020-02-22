@@ -77,7 +77,7 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 	}
 
 	executionRoleInput := &iam.DeleteRoleInput{
-		RoleName: input.ExecutionRole,
+		RoleName: input.ExecutionRoleName,
 	}
 	_, err = iamSvc.DeleteRole(executionRoleInput)
 	utils.CheckAWSErrExpect404(err, "IAM Role - Execution Role")

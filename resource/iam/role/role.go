@@ -11,6 +11,7 @@ type IamRole struct {
 	Path                     string
 	PermissionsBoundary      string
 	RoleName                 string
+	RoleArn                  string
 	Tags                     []*iam.Tag
 	AssumeRolePolicyDocument string
 }
@@ -31,7 +32,8 @@ func (resource *IamRole) Create() error {
 	if len(resource.PermissionsBoundary) >= 20 {
 		createRoleInput.PermissionsBoundary = &resource.PermissionsBoundary
 	}
-	_, err := svc.CreateRole(createRoleInput)
+	response, err := svc.CreateRole(createRoleInput)
+	resource.RoleArn = *response.Role.Arn
 	return err
 }
 

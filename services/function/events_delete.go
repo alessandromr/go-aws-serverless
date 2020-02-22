@@ -8,10 +8,10 @@ type S3DeleteEvent struct {
 
 //HTTPDeleteEvent  HTTP (API Gateway) trigger of a lambda function
 type HTTPDeleteEvent struct {
-	ApiId         *string
-	ResourceId    *string
-	Method        *string
-	ExecutionRole *string
+	ApiId             *string
+	ResourceId        *string
+	Method            *string
+	ExecutionRoleName *string
 }
 
 //SQSDeleteEvent SQS trigger of a lambda function

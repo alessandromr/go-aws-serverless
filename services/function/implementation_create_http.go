@@ -24,9 +24,10 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	svc := auth.Client.ApigatewayConn
 	var err error
 
-	if input.HTTPCreateEvent.ExecutionRole == nil {
+	var executionRole role.IamRole
+	if *input.HTTPCreateEvent.ExecutionRoleArn == "" {
 		//iam.CreateRole
-		executionRole := role.IamRole{
+		executionRole = role.IamRole{
 			AssumeRolePolicyDocument: executionRoleAssumeRoleString,
 			Description:              "Role to allow API Gateway to invoke Lambda functions on behalf of the API caller.",
 			RoleName:                 "ApiExecutionRole-" + *lambdaResult.FunctionName,
@@ -35,7 +36,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 			create.ResourcesList,
 			&executionRole,
 		)
-		input.HTTPCreateEvent.ExecutionRole = &executionRole.RoleName
+		input.HTTPCreateEvent.ExecutionRoleArn = &executionRole.RoleArn
 	}
 
 	//apigateway.CreateRestApi
@@ -110,7 +111,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		ResourceId:            apiResource.ResourceId,
 		RestApiId:             *input.HTTPCreateEvent.ApiId,
 		Uri:                   "arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations",
-		Credentials:           *input.HTTPCreateEvent.ExecutionRole,
+		Credentials:           *input.HTTPCreateEvent.ExecutionRoleArn,
 		Type:                  "AWS_PROXY",
 	}
 	create.ResourcesList = append(
@@ -128,7 +129,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	out["RestApiId"] = *input.HTTPCreateEvent.ApiId
 	out["Method"] = *input.HTTPCreateEvent.Method
 	out["ResourceId"] = apiResource.ResourceId
-	out["ExecutionRoleName"] = "ApiExecutionRole-" + *lambdaResult.FunctionName
+	out["ExecutionRoleName"] = executionRole.RoleName
 	return out, nil
 }
 

@@ -8,10 +8,10 @@ type S3ReadEvent struct {
 
 //HTTPReadEvent  HTTP (API Gateway) trigger of a lambda function
 type HTTPReadEvent struct {
-	ApiId         *string
-	ResourceId    *string
-	Method        *string
-	ExecutionRole *string
+	ApiId             *string
+	ResourceId        *string
+	Method            *string
+	ExecutionRoleName *string
 }
 
 //SQSReadEvent SQS trigger of a lambda function
