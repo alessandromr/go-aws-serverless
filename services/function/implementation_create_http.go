@@ -115,7 +115,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		RestApiId:             *input.HTTPCreateEvent.ApiId,
 		Uri:                   "arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations",
 		// Credentials:           *input.HTTPCreateEvent.ExecutionRoleArn,
-		Type: "AWS",
+		Type: "AWS_PROXY",
 	}
 	create.ResourcesList = append(
 		create.ResourcesList,
