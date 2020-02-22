@@ -4,10 +4,12 @@ import (
 	"time"
 
 	"github.com/alessandromr/go-aws-serverless/manager/create"
+	"github.com/alessandromr/go-aws-serverless/resource/apigateway/deployment"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/integration"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/method"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/resource"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/rest"
+	"github.com/alessandromr/go-aws-serverless/resource/apigateway/stage"
 	"github.com/alessandromr/go-aws-serverless/resource/iam/role"
 	"github.com/alessandromr/go-aws-serverless/resource/lambda/permission"
 	"github.com/alessandromr/go-aws-serverless/utils"
@@ -122,6 +124,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		&apiIntegration,
 	)
 
+	//Create Lambda Permission
 	permission := permission.LambdaPermission{
 		StatementId:  "HTTPEvent_" + *input.HTTPCreateEvent.ApiId + "_" + *lambdaResult.FunctionName,
 		FunctionName: *lambdaResult.FunctionArn,
@@ -132,6 +135,28 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	create.ResourcesList = append(
 		create.ResourcesList,
 		&permission,
+	)
+
+	//API Deployment
+	apiDeployment := deployment.ApiGatewayDeployment{
+		RestApiId:        *input.HTTPCreateEvent.ApiId,
+		StageName:        "default",
+		StageDescription: "Default Stage",
+	}
+	create.ResourcesList = append(
+		create.ResourcesList,
+		&apiDeployment,
+	)
+
+	//API Stage
+	apiStage := stage.ApiGatewayStage{
+		RestApiId:    *input.HTTPCreateEvent.ApiId,
+		StageName:    "default",
+		DeploymentID: apiDeployment.DeploymentId,
+	}
+	create.ResourcesList = append(
+		create.ResourcesList,
+		&apiStage,
 	)
 
 	//Create Resources
