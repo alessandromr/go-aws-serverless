@@ -2,10 +2,10 @@ package method
 
 import (
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 )
 
+//ApiGatewayMethod
 type ApiGatewayMethod struct {
 	HttpMethod        string
 	ResourceId        string
@@ -19,10 +19,10 @@ func (resource *ApiGatewayMethod) Create() error {
 	svc := auth.Client.ApigatewayConn
 
 	methodInput := &apigateway.PutMethodInput{
-		HttpMethod:        aws.String(resource.HttpMethod),
-		RestApiId:         aws.String(resource.RestApiId),
-		ResourceId:        aws.String(resource.ResourceId),
-		AuthorizationType: aws.String(resource.AuthorizationType),
+		HttpMethod:        &resource.HttpMethod,
+		RestApiId:         &resource.RestApiId,
+		ResourceId:        &resource.ResourceId,
+		AuthorizationType: &resource.AuthorizationType,
 	}
 
 	_, err := svc.PutMethod(methodInput)

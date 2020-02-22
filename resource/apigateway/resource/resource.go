@@ -2,7 +2,6 @@ package resource
 
 import (
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 )
 
@@ -20,9 +19,9 @@ func (resource *ApiGatewayResource) Create() error {
 	svc := auth.Client.ApigatewayConn
 
 	resourceInput := &apigateway.CreateResourceInput{
-		PathPart:  aws.String(resource.Path),
-		RestApiId: aws.String(resource.RestApiId),
-		ParentId:  aws.String(resource.ParentId),
+		PathPart:  &resource.Path,
+		RestApiId: &resource.RestApiId,
+		ParentId:  &resource.ParentId,
 	}
 
 	createResourceOutput, err := svc.CreateResource(resourceInput)
