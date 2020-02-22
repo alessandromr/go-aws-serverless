@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/aws/aws-sdk-go/service/sts"
 )
 
 var Client AWSClient
@@ -23,6 +24,7 @@ type AWSClient struct {
 	SNSConn              *sns.SNS
 	CloudwatchEventsConn *cloudwatchevents.CloudWatchEvents
 	IamConn              *iam.IAM
+	StsConn              *sts.STS
 }
 
 func MakeClient(sess *session.Session) {
@@ -35,5 +37,6 @@ func MakeClient(sess *session.Session) {
 		SNSConn:              sns.New(sess),
 		CloudwatchEventsConn: cloudwatchevents.New(sess),
 		IamConn:              iam.New(sess),
+		StsConn:              sts.New(sess),
 	}
 }

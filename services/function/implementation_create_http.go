@@ -9,6 +9,7 @@ import (
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/resource"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/rest"
 	"github.com/alessandromr/go-aws-serverless/resource/iam/role"
+	"github.com/alessandromr/go-aws-serverless/resource/lambda/permission"
 	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
 	"github.com/aws/aws-sdk-go/service/apigateway"
@@ -23,6 +24,8 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	auth.MakeClient(auth.Sess)
 	svc := auth.Client.ApigatewayConn
 	var err error
+
+	accountID := auth.GetAccountID()
 
 	var executionRole role.IamRole
 	if input.HTTPCreateEvent.ExecutionRoleArn == nil || len(*input.HTTPCreateEvent.ExecutionRoleArn) < 20 {
@@ -117,6 +120,18 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	create.ResourcesList = append(
 		create.ResourcesList,
 		&apiIntegration,
+	)
+
+	permission := permission.LambdaPermission{
+		StatementId:  "HTTPEvent_" + *input.HTTPCreateEvent.ApiId + "_" + *lambdaResult.FunctionName,
+		FunctionName: *lambdaResult.FunctionArn,
+		SourceArn:    "arn:aws:execute-api:" + auth.Region + ":" + accountID + ":" + *input.HTTPCreateEvent.ApiId + "/*/" + *input.HTTPCreateEvent.Method + "/" + *input.HTTPCreateEvent.Path,
+		Principal:    "apigateway.amazonaws.com",
+		Action:       "lambda:InvokeFunction",
+	}
+	create.ResourcesList = append(
+		create.ResourcesList,
+		&permission,
 	)
 
 	//Create Resources
