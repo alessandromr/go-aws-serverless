@@ -8,17 +8,63 @@ import (
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/method"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/resource"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/rest"
+	"github.com/alessandromr/go-aws-serverless/resource/iam/role"
 	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
 )
 
+var executionRoleAssumeRoleString string = `
+{
+	"Version": "2012-10-17",
+	"Statement": [
+	  {
+		"Sid": "",
+		"Effect": "Allow",
+		"Principal": {
+		  "Service": "apigateway.amazonaws.com"
+		},
+		"Action": "sts:AssumeRole"
+	  }
+	]
+  }
+`
+
+var executionRolePolicyString string = `
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": "lambda:InvokeFunction",
+			"Resource": "*"
+		}
+	]
+}
+`
+
 //CreateDependencies create all the dependencies for the HTTPEvent
 func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) (map[string]interface{}, error) {
 	auth.MakeClient(auth.Sess)
 	svc := auth.Client.ApigatewayConn
 	var err error
+
+	if input.HTTPCreateEvent.ExecutionRole == nil {
+		//iam.CreateRole
+		executionRole := role.IamRole{
+			AssumeRolePolicyDocument: executionRoleAssumeRoleString,
+			Description:              "Role to allow API Gateway to invoke Lambda functions on behalf of the API caller.",
+			RoleName:                 "ApiExecutionRole-" + *lambdaResult.FunctionName,
+			Path:                     "",
+			PermissionsBoundary:      "",
+		}
+		create.ResourcesList = append(
+			create.ResourcesList,
+			&executionRole,
+		)
+		input.HTTPCreateEvent.ExecutionRole = &executionRole.RoleName
+	}
 
 	//apigateway.CreateRestApi
 	if !input.HTTPCreateEvent.Existing {
@@ -110,6 +156,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	out["RestApiId"] = *input.HTTPCreateEvent.ApiId
 	out["Method"] = *input.HTTPCreateEvent.Method
 	out["ResourceId"] = apiResource.ResourceId
+	out["ExecutionRoleName"] = "ApiExecutionRole-" + *lambdaResult.FunctionName
 	return out, nil
 }
 
