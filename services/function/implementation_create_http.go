@@ -130,6 +130,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	out["Method"] = *input.HTTPCreateEvent.Method
 	out["ResourceId"] = apiResource.ResourceId
 	out["ExecutionRoleName"] = executionRole.RoleName
+	out["ExecutionRoleArn"] = executionRole.RoleArn
 	return out, nil
 }
 
