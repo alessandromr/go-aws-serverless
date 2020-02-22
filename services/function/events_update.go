@@ -12,11 +12,10 @@ type S3UpdateEvent struct {
 
 //HTTPUpdateEvent HTTP (API Gateway) trigger of a lambda function
 type HTTPUpdateEvent struct {
-	Path          *string
-	Method        *string
-	Existing      bool
-	ApiId         *string
-	ResourceId    *string
-	ApiName       *string
-	ExecutionRole *string
+	Path       *string
+	Method     *string
+	Existing   bool
+	ApiId      *string
+	ResourceId *string
+	ApiName    *string
 }

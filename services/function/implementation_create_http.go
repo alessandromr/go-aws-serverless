@@ -4,21 +4,28 @@ import (
 	"time"
 
 	"github.com/alessandromr/go-aws-serverless/manager/create"
+	"github.com/alessandromr/go-aws-serverless/resource/apigateway/deployment"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/integration"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/method"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/resource"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/rest"
+	"github.com/alessandromr/go-aws-serverless/resource/lambda/permission"
 	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
 )
 
+var executionRoleAssumeRoleString string = `{"Version":"2012-10-17","Statement":[{"Sid":"","Effect":"Allow","Principal":{"Service":"apigateway.amazonaws.com"},"Action":"sts:AssumeRole"}]}`
+var executionRolePolicyString string = `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":"lambda:InvokeFunction","Resource":"*"}]}`
+
 //CreateDependencies create all the dependencies for the HTTPEvent
 func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) (map[string]interface{}, error) {
 	auth.MakeClient(auth.Sess)
 	svc := auth.Client.ApigatewayConn
 	var err error
+
+	accountID := auth.GetAccountID()
 
 	//apigateway.CreateRestApi
 	if !input.HTTPCreateEvent.Existing {
@@ -92,12 +99,36 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		ResourceId:            apiResource.ResourceId,
 		RestApiId:             *input.HTTPCreateEvent.ApiId,
 		Uri:                   "arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations",
-		Credentials:           *input.HTTPCreateEvent.ExecutionRole,
-		Type:                  "AWS_PROXY",
+		// Credentials:           *input.HTTPCreateEvent.ExecutionRoleArn,
+		Type: "AWS_PROXY",
 	}
 	create.ResourcesList = append(
 		create.ResourcesList,
 		&apiIntegration,
+	)
+
+	//Create Lambda Permission
+	permission := permission.LambdaPermission{
+		StatementId:  "HTTPEvent_" + *input.HTTPCreateEvent.ApiId + "_" + *lambdaResult.FunctionName,
+		FunctionName: *lambdaResult.FunctionArn,
+		SourceArn:    "arn:aws:execute-api:" + auth.Region + ":" + accountID + ":" + *input.HTTPCreateEvent.ApiId + "/*/*/" + *input.HTTPCreateEvent.Path,
+		Principal:    "apigateway.amazonaws.com",
+		Action:       "lambda:InvokeFunction",
+	}
+	create.ResourcesList = append(
+		create.ResourcesList,
+		&permission,
+	)
+
+	//API Deployment
+	apiDeployment := deployment.ApiGatewayDeployment{
+		RestApiId:        *input.HTTPCreateEvent.ApiId,
+		StageName:        "default",
+		StageDescription: "Default Stage",
+	}
+	create.ResourcesList = append(
+		create.ResourcesList,
+		&apiDeployment,
 	)
 
 	//Create Resources

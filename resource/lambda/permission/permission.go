@@ -2,7 +2,6 @@ package permission
 
 import (
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/lambda"
 )
 
@@ -20,11 +19,11 @@ func (resource *LambdaPermission) Create() error {
 	auth.MakeClient(auth.Sess)
 	svc := auth.Client.LambdaConn
 	permissionsInput := &lambda.AddPermissionInput{
-		Action:       aws.String(resource.Action),
-		FunctionName: aws.String(resource.FunctionName),
-		Principal:    aws.String(resource.Principal),
-		SourceArn:    aws.String(resource.SourceArn),
-		StatementId:  aws.String(resource.StatementId),
+		Action:       &resource.Action,
+		FunctionName: &resource.FunctionName,
+		Principal:    &resource.Principal,
+		SourceArn:    &resource.SourceArn,
+		StatementId:  &resource.StatementId,
 	}
 	_, err := svc.AddPermission(permissionsInput)
 	return err

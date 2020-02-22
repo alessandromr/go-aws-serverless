@@ -2,7 +2,6 @@ package rest
 
 import (
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
-	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 )
 
@@ -18,7 +17,7 @@ func (resource *ApiGatewayRestApi) Create() error {
 	svc := auth.Client.ApigatewayConn
 
 	apiInput := &apigateway.CreateRestApiInput{
-		Name: aws.String(resource.ApiName),
+		Name: &resource.ApiName,
 	}
 	response, err := svc.CreateRestApi(apiInput)
 	resource.RestApiId = *response.Id

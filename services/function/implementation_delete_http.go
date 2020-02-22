@@ -1,11 +1,12 @@
 package function
 
 import (
+	"time"
+
 	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/lambda"
-	"time"
 )
 
 //DeleteDependencies implements the dependencies deletion for HTTP Event

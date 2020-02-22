@@ -20,11 +20,11 @@ func (resource *S3NotificationConfiguration) Create() error {
 	svc := auth.Client.S3Conn
 
 	putNotConfig := &s3.PutBucketNotificationConfigurationInput{
-		Bucket: aws.String(resource.Bucket),
+		Bucket: &resource.Bucket,
 		NotificationConfiguration: &s3.NotificationConfiguration{
 			LambdaFunctionConfigurations: []*s3.LambdaFunctionConfiguration{
 				{
-					LambdaFunctionArn: aws.String(resource.FunctionArn),
+					LambdaFunctionArn: &resource.FunctionArn,
 					Events:            aws.StringSlice(resource.Events),
 				},
 			},
