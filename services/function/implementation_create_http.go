@@ -10,7 +10,6 @@ import (
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/resource"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/rest"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/stage"
-	"github.com/alessandromr/go-aws-serverless/resource/iam/role"
 	"github.com/alessandromr/go-aws-serverless/resource/lambda/permission"
 	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
@@ -28,21 +27,6 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	var err error
 
 	accountID := auth.GetAccountID()
-
-	var executionRole role.IamRole
-	if input.HTTPCreateEvent.ExecutionRoleArn == nil || len(*input.HTTPCreateEvent.ExecutionRoleArn) < 20 {
-		//iam.CreateRole
-		executionRole = role.IamRole{
-			AssumeRolePolicyDocument: executionRoleAssumeRoleString,
-			Description:              "Role to allow API Gateway to invoke Lambda functions on behalf of the API caller.",
-			RoleName:                 "ApiExecutionRole-" + *lambdaResult.FunctionName,
-		}
-		create.ResourcesList = append(
-			create.ResourcesList,
-			&executionRole,
-		)
-		input.HTTPCreateEvent.ExecutionRoleArn = &executionRole.RoleArn
-	}
 
 	//apigateway.CreateRestApi
 	if !input.HTTPCreateEvent.Existing {
@@ -169,8 +153,6 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	out["RestApiId"] = *input.HTTPCreateEvent.ApiId
 	out["Method"] = *input.HTTPCreateEvent.Method
 	out["ResourceId"] = apiResource.ResourceId
-	out["ExecutionRoleName"] = executionRole.RoleName
-	out["ExecutionRoleArn"] = executionRole.RoleArn
 	return out, nil
 }
 

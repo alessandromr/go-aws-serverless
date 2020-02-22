@@ -6,7 +6,6 @@ import (
 	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
 	"github.com/aws/aws-sdk-go/service/apigateway"
-	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/lambda"
 )
 
@@ -14,7 +13,6 @@ import (
 func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.DeleteFunctionInput) {
 	auth.MakeClient(auth.Sess)
 	svc := auth.Client.ApigatewayConn
-	iamSvc := auth.Client.IamConn
 	var err error
 
 	time.Sleep(utils.LongSleep * time.Millisecond)
@@ -74,14 +72,6 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 		}
 		_, err = svc.DeleteRestApi(apiInput)
 		utils.CheckAWSErrExpect404(err, "API Gateway Rest API")
-	}
-
-	if input.ExecutionRoleName != nil && len(*input.ExecutionRoleName) > 1 {
-		executionRoleInput := &iam.DeleteRoleInput{
-			RoleName: input.ExecutionRoleName,
-		}
-		_, err = iamSvc.DeleteRole(executionRoleInput)
-		utils.CheckAWSErrExpect404(err, "IAM Role - Execution Role")
 	}
 
 }
