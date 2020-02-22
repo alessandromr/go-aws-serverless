@@ -9,7 +9,6 @@ import (
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/method"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/resource"
 	"github.com/alessandromr/go-aws-serverless/resource/apigateway/rest"
-	"github.com/alessandromr/go-aws-serverless/resource/apigateway/stage"
 	"github.com/alessandromr/go-aws-serverless/resource/lambda/permission"
 	"github.com/alessandromr/go-aws-serverless/utils"
 	"github.com/alessandromr/go-aws-serverless/utils/auth"
@@ -130,17 +129,6 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	create.ResourcesList = append(
 		create.ResourcesList,
 		&apiDeployment,
-	)
-
-	//API Stage
-	apiStage := stage.ApiGatewayStage{
-		RestApiId:    *input.HTTPCreateEvent.ApiId,
-		StageName:    "default",
-		DeploymentID: apiDeployment.DeploymentId,
-	}
-	create.ResourcesList = append(
-		create.ResourcesList,
-		&apiStage,
 	)
 
 	//Create Resources
