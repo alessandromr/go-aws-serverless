@@ -15,34 +15,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/lambda"
 )
 
-var executionRoleAssumeRoleString string = `
-{
-	"Version": "2012-10-17",
-	"Statement": [
-	  {
-		"Sid": "",
-		"Effect": "Allow",
-		"Principal": {
-		  "Service": "apigateway.amazonaws.com"
-		},
-		"Action": "sts:AssumeRole"
-	  }
-	]
-  }
-`
-
-var executionRolePolicyString string = `
-{
-	"Version": "2012-10-17",
-	"Statement": [
-		{
-			"Effect": "Allow",
-			"Action": "lambda:InvokeFunction",
-			"Resource": "*"
-		}
-	]
-}
-`
+var executionRoleAssumeRoleString string = `{"Version":"2012-10-17","Statement":[{"Sid":"","Effect":"Allow","Principal":{"Service":"apigateway.amazonaws.com"},"Action":"sts:AssumeRole"}]}`
+var executionRolePolicyString string = `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":"lambda:InvokeFunction","Resource":"*"}]}`
 
 //CreateDependencies create all the dependencies for the HTTPEvent
 func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.FunctionConfiguration) (map[string]interface{}, error) {
@@ -56,8 +30,6 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 			AssumeRolePolicyDocument: executionRoleAssumeRoleString,
 			Description:              "Role to allow API Gateway to invoke Lambda functions on behalf of the API caller.",
 			RoleName:                 "ApiExecutionRole-" + *lambdaResult.FunctionName,
-			Path:                     "",
-			PermissionsBoundary:      "",
 		}
 		create.ResourcesList = append(
 			create.ResourcesList,
