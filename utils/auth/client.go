@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/apigateway"
 	"github.com/aws/aws-sdk-go/service/apigatewayv2"
 	"github.com/aws/aws-sdk-go/service/cloudwatchevents"
+	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/sns"
@@ -21,6 +22,7 @@ type AWSClient struct {
 	SQSConn              *sqs.SQS
 	SNSConn              *sns.SNS
 	CloudwatchEventsConn *cloudwatchevents.CloudWatchEvents
+	IamConn              *iam.IAM
 }
 
 func MakeClient(sess *session.Session) {
@@ -32,5 +34,6 @@ func MakeClient(sess *session.Session) {
 		SQSConn:              sqs.New(sess),
 		SNSConn:              sns.New(sess),
 		CloudwatchEventsConn: cloudwatchevents.New(sess),
+		IamConn:              iam.New(sess),
 	}
 }

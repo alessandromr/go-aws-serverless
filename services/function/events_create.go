@@ -11,12 +11,12 @@ type S3CreateEvent struct {
 
 //HTTPCreateEvent HTTP (API Gateway) trigger of a lambda function
 type HTTPCreateEvent struct {
-	Path          *string
-	Method        *string
-	Existing      bool
-	ApiId         *string
-	ApiName       *string
-	ExecutionRole *string
+	Path             *string
+	Method           *string
+	Existing         bool
+	ApiId            *string
+	ApiName          *string
+	ExecutionRoleArn *string
 }
 
 //SQSCreateEvent SQS trigger of a lambda function
