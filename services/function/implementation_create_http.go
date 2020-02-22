@@ -114,8 +114,8 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 		ResourceId:            apiResource.ResourceId,
 		RestApiId:             *input.HTTPCreateEvent.ApiId,
 		Uri:                   "arn:aws:apigateway:" + auth.Region + ":lambda:path/2015-03-31/functions/" + *lambdaResult.FunctionArn + "/invocations",
-		Credentials:           *input.HTTPCreateEvent.ExecutionRoleArn,
-		Type:                  "AWS_PROXY",
+		// Credentials:           *input.HTTPCreateEvent.ExecutionRoleArn,
+		Type: "AWS",
 	}
 	create.ResourcesList = append(
 		create.ResourcesList,
@@ -125,7 +125,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	permission := permission.LambdaPermission{
 		StatementId:  "HTTPEvent_" + *input.HTTPCreateEvent.ApiId + "_" + *lambdaResult.FunctionName,
 		FunctionName: *lambdaResult.FunctionArn,
-		SourceArn:    "arn:aws:execute-api:" + auth.Region + ":" + accountID + ":" + *input.HTTPCreateEvent.ApiId + "/*/" + *input.HTTPCreateEvent.Method + "/" + *input.HTTPCreateEvent.Path,
+		SourceArn:    "arn:aws:execute-api:" + auth.Region + ":" + accountID + ":" + *input.HTTPCreateEvent.ApiId + "/*/*/" + *input.HTTPCreateEvent.Path,
 		Principal:    "apigateway.amazonaws.com",
 		Action:       "lambda:InvokeFunction",
 	}
