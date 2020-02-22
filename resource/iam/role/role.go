@@ -21,11 +21,15 @@ func (resource *IamRole) Create() error {
 	svc := auth.Client.IamConn
 	createRoleInput := &iam.CreateRoleInput{
 		Description:              &resource.Description,
-		Path:                     &resource.Path,
 		RoleName:                 &resource.RoleName,
-		PermissionsBoundary:      &resource.PermissionsBoundary,
 		AssumeRolePolicyDocument: &resource.AssumeRolePolicyDocument,
 		Tags:                     resource.Tags,
+	}
+	if len(resource.Path) >= 1 {
+		createRoleInput.Path = &resource.Path
+	}
+	if len(resource.PermissionsBoundary) >= 20 {
+		createRoleInput.PermissionsBoundary = &resource.PermissionsBoundary
 	}
 	_, err := svc.CreateRole(createRoleInput)
 	return err
