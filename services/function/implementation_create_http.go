@@ -25,7 +25,7 @@ func (input HTTPCreateFunctionInput) CreateDependencies(lambdaResult *lambda.Fun
 	var err error
 
 	var executionRole role.IamRole
-	if input.HTTPCreateEvent.ExecutionRoleArn == nil || len(*input.HTTPCreateEvent.ExecutionRoleArn) >= 20 {
+	if input.HTTPCreateEvent.ExecutionRoleArn == nil || len(*input.HTTPCreateEvent.ExecutionRoleArn) < 20 {
 		//iam.CreateRole
 		executionRole = role.IamRole{
 			AssumeRolePolicyDocument: executionRoleAssumeRoleString,

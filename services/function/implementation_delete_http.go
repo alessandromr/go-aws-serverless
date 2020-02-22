@@ -76,11 +76,13 @@ func (input HTTPDeleteFunctionInput) DeleteDependencies(lambdaResult *lambda.Del
 		utils.CheckAWSErrExpect404(err, "API Gateway Rest API")
 	}
 
-	executionRoleInput := &iam.DeleteRoleInput{
-		RoleName: input.ExecutionRoleName,
+	if input.ExecutionRoleName != nil && len(*input.ExecutionRoleName) > 1 {
+		executionRoleInput := &iam.DeleteRoleInput{
+			RoleName: input.ExecutionRoleName,
+		}
+		_, err = iamSvc.DeleteRole(executionRoleInput)
+		utils.CheckAWSErrExpect404(err, "IAM Role - Execution Role")
 	}
-	_, err = iamSvc.DeleteRole(executionRoleInput)
-	utils.CheckAWSErrExpect404(err, "IAM Role - Execution Role")
 
 }
 
